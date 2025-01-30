@@ -341,7 +341,7 @@ const props = defineProps({
     },
     filtering: {
         type: Object,
-        default: () => ({}),
+        default: () => null,
     },
     showingLimit: {
         type: Boolean,

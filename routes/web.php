@@ -5,6 +5,7 @@ use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AccountSubCategoryController;
 use App\Http\Controllers\ChartOfAccountController;
 use App\Http\Controllers\JournalEntryController;
+use App\Http\Controllers\LedgerController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\ProfileController;
 use App\Models\ChartOfAccount;
@@ -45,6 +46,10 @@ Route::resource('account-sub-category', AccountSubCategoryController::class)
     ->middleware(['auth', 'verified']);
 Route::resource('accounting/journal-entries', JournalEntryController::class)
     ->middleware(['auth', 'verified']);
+
+Route::resource('accounting/ledger', LedgerController::class)->only(['index'])
+    ->middleware(['auth', 'verified']);
+
 
 
 

@@ -103,7 +103,7 @@ export const useMainStore = defineStore('main', {
                     },
                     {
                         title: 'Ledger',
-                        url: 'chart-of-accounts.index',
+                        url: 'ledger.index',
                     },
                     {
                         title: 'Balance Sheet',
