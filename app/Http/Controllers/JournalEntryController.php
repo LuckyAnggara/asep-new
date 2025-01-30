@@ -7,6 +7,7 @@ use App\Models\JournalEntry;
 use App\Models\JournalEntryDetail;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class JournalEntryController extends Controller
@@ -66,9 +67,9 @@ class JournalEntryController extends Controller
             'reference' => 'nullable|string|max:255',
             'date' => 'required|date_format:Y-m-d',
             'description' => 'required|string',
-            'attachment' => 'nullable|file|mimes:jpg,png,pdf|max:2048',
+            'attachment' => 'nullable|file|mimes:jpg,png,pdf|max:4096',
             'details' => 'required|array|min:1',
-            'details.*.account_id' => 'required|exists:chart_of_accounts,id',
+            'details.*.chart_of_accounts_id' => 'required|exists:chart_of_accounts,id',
             'details.*.debit' => 'required|numeric|min:0',
             'details.*.credit' => 'required|numeric|min:0',
         ]);
@@ -92,12 +93,93 @@ class JournalEntryController extends Controller
         foreach ($request->details as $detail) {
             JournalEntryDetail::create([
                 'journal_entry_id' => $journalEntry->id,
-                'account_id' => $detail['account_id'],
+                'chart_of_accounts_id' => $detail['chart_of_accounts_id'],
                 'debit' => $detail['debit'],
                 'credit' => $detail['credit'],
             ]);
         }
 
         return redirect()->route('journal-entries.index')->with('success', 'Journal Entry berhasil ditambahkan.');
+    }
+
+    public function edit($id)
+    {
+        $journalEntry = JournalEntry::with('details')->where('id', $id)->first();
+        return Inertia::render('accounting/journal/Edit', [
+            'journal_entry' => $journalEntry,
+            'accounts' => ChartOfAccount::all()
+        ]);
+    }
+
+    public function update(Request $request, $id)
+    {
+
+        // Validasi input
+        $request->validate([
+            'reference' => 'nullable|string|max:255',
+            'date' => 'required|date_format:Y-m-d',
+            'description' => 'required|string',
+            'attachment' => 'nullable|file|mimes:jpg,png,pdf|max:4096',
+            'details' => 'required|array|min:1',
+            'details.*.chart_of_accounts_id' => 'required|exists:chart_of_accounts,id',
+            'details.*.debit' => 'required|numeric|min:0',
+            'details.*.credit' => 'required|numeric|min:0',
+        ]);
+
+        // Temukan journal entry yang akan diupdate
+        $journalEntry = JournalEntry::findOrFail($id);
+
+        // Handle file attachment
+        $attachmentPath = $journalEntry->attachment; // Simpan path lama sebagai fallback
+        if ($request->hasFile('attachment')) {
+            // Hapus file lama jika ada
+            if ($journalEntry->attachment) {
+                Storage::disk('public')->delete($journalEntry->attachment);
+            }
+            // Simpan file baru
+            $attachmentPath = $request->file('attachment')->store('journal_attachments', 'public');
+        }
+
+        // Update data Journal Entry
+        $journalEntry->update([
+            'reference' => $request->reference,
+            'date' => Carbon::parse($request->date)->toDateString(),
+            'description' => $request->description,
+            'attachment' => $attachmentPath,
+        ]);
+
+        // Hapus details lama
+        $journalEntry->details()->delete();
+
+        // Simpan details baru
+        foreach ($request->details as $detail) {
+            JournalEntryDetail::create([
+                'journal_entry_id' => $journalEntry->id,
+                'chart_of_accounts_id' => $detail['chart_of_accounts_id'],
+                'debit' => $detail['debit'],
+                'credit' => $detail['credit'],
+            ]);
+        }
+
+        return redirect()->route('journal-entries.index')->with('success', 'Journal Entry berhasil diperbarui.');
+    }
+
+
+    public function destroy($id)
+    {
+        $journalEntry = JournalEntry::findOrFail($id);
+
+        // Hapus file jika ada
+        if ($journalEntry->attachment) {
+            Storage::disk('public')->delete($journalEntry->attachment);
+        }
+
+        // Hapus details terlebih dahulu
+        $journalEntry->details()->delete();
+
+        // Hapus Journal Entry
+        $journalEntry->delete();
+
+        return redirect()->route('journal-entries.index')->with('success', 'Journal Entry berhasil dihapus.');
     }
 }

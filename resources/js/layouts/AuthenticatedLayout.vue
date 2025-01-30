@@ -16,11 +16,7 @@ import {
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 
-import {
-    Collapsible,
-    CollapsibleContent,
-    CollapsibleTrigger,
-} from '@/components/ui/collapsible';
+import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -28,7 +24,6 @@ import {
     DropdownMenuItem,
     DropdownMenuLabel,
     DropdownMenuSeparator,
-    DropdownMenuShortcut,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Separator } from '@/components/ui/separator';
@@ -41,7 +36,6 @@ import {
     SidebarHeader,
     SidebarInset,
     SidebarMenu,
-    SidebarMenuAction,
     SidebarMenuButton,
     SidebarMenuItem,
     SidebarMenuSub,
@@ -52,34 +46,14 @@ import {
     SidebarTrigger,
 } from '@/components/ui/sidebar';
 import {
-    AudioWaveform,
     BadgeCheck,
-    Bell,
-    Bot,
-    BookOpen,
     ChevronRight,
     ChevronsUpDown,
-    Command,
-    CreditCard,
-    Folder,
-    Forward,
-    Frame,
     GalleryVerticalEnd,
     LogOut,
-    Map,
-    MoreHorizontal,
-    PieChart,
-    Plus,
     Settings2,
-    Sparkles,
-    SquareTerminal,
-    Trash2,
-    BookOpenCheck,
-    UserCircleIcon,
-    UserCircle2,
 } from 'lucide-vue-next';
-import { computed, reactive, ref } from 'vue';
-import { TreeItem } from 'radix-vue';
+import { computed } from 'vue';
 const mode = useColorMode();
 const mainStore = useMainStore();
 const page = usePage();
@@ -87,19 +61,17 @@ const page = usePage();
 const data = computed(() => {
     return {
         user: {
-            name: 'shadcn',
-            email: 'm@example.com',
             avatar: 'https://s3.amazonaws.com/37assets/svn/765-default-avatar.png',
+            ...page.props.auth.user,
         },
         company: {
-            name: 'Acme Inc',
+            name: 'Asep Inc',
             logo: GalleryVerticalEnd,
             plan: 'Enterprise',
         },
     };
 });
 
-const url = computed(() => page.url);
 function goTo(url) {
     router.visit(route(url), {
         preserveState: true,

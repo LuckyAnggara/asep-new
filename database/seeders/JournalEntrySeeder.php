@@ -19,123 +19,234 @@ class JournalEntrySeeder extends Seeder
                 'date' => Carbon::now()->subDays(10),
                 'description' => 'Purchase of Office Supplies',
                 'details' => [
-                    ['account_id' => 10, 'debit' => 500, 'credit' => 0], // Supplies
-                    ['account_id' => 17, 'debit' => 0, 'credit' => 500], // Accounts Payable
+                    ['chart_of_accounts_id' => 10, 'debit' => 500, 'credit' => 0], // Supplies
+                    ['chart_of_accounts_id' => 17, 'debit' => 0, 'credit' => 500], // Accounts Payable
                 ],
             ],
             [
                 'date' => Carbon::now()->subDays(9),
                 'description' => 'Payment to Supplier',
                 'details' => [
-                    ['account_id' => 17, 'debit' => 500, 'credit' => 0], // Accounts Payable
-                    ['account_id' => 3, 'debit' => 0, 'credit' => 500], // Cash
+                    ['chart_of_accounts_id' => 17, 'debit' => 500, 'credit' => 0], // Accounts Payable
+                    ['chart_of_accounts_id' => 3, 'debit' => 0, 'credit' => 500], // Cash
                 ],
             ],
             [
                 'date' => Carbon::now()->subDays(8),
                 'description' => 'Client Payment for Services',
                 'details' => [
-                    ['account_id' => 3, 'debit' => 2000, 'credit' => 0], // Cash
-                    ['account_id' => 4, 'debit' => 0, 'credit' => 2000], // Accounts Receivable
+                    ['chart_of_accounts_id' => 3, 'debit' => 2000, 'credit' => 0], // Cash
+                    ['chart_of_accounts_id' => 4, 'debit' => 0, 'credit' => 2000], // Accounts Receivable
                 ],
             ],
             [
                 'date' => Carbon::now()->subDays(7),
                 'description' => 'Rent Payment',
                 'details' => [
-                    ['account_id' => 19, 'debit' => 1000, 'credit' => 0], // Rent Expense
-                    ['account_id' => 3, 'debit' => 0, 'credit' => 1000], // Cash
+                    ['chart_of_accounts_id' => 19, 'debit' => 1000, 'credit' => 0], // Rent Expense
+                    ['chart_of_accounts_id' => 3, 'debit' => 0, 'credit' => 1000], // Cash
                 ],
             ],
             [
                 'date' => Carbon::now()->subDays(6),
                 'description' => 'Salary Payment',
                 'details' => [
-                    ['account_id' => 9, 'debit' => 3000, 'credit' => 0], // Salaries Expense
-                    ['account_id' => 3, 'debit' => 0, 'credit' => 3000], // Cash
+                    ['chart_of_accounts_id' => 9, 'debit' => 3000, 'credit' => 0], // Salaries Expense
+                    ['chart_of_accounts_id' => 3, 'debit' => 0, 'credit' => 3000], // Cash
                 ],
             ],
             [
                 'date' => Carbon::now()->subDays(5),
                 'description' => 'Purchase of Equipment',
                 'details' => [
-                    ['account_id' => 18, 'debit' => 5000, 'credit' => 0], // Equipment
-                    ['account_id' => 2, 'debit' => 0, 'credit' => 5000], // Cash
+                    ['chart_of_accounts_id' => 18, 'debit' => 5000, 'credit' => 0], // Equipment
+                    ['chart_of_accounts_id' => 2, 'debit' => 0, 'credit' => 5000], // Cash
                 ],
             ],
             [
                 'date' => Carbon::now()->subDays(4),
                 'description' => 'Owner Investment',
                 'details' => [
-                    ['account_id' => 3, 'debit' => 7000, 'credit' => 0], // Cash
-                    ['account_id' => 7, 'debit' => 0, 'credit' => 7000], // Owner’s Capital
+                    ['chart_of_accounts_id' => 3, 'debit' => 7000, 'credit' => 0], // Cash
+                    ['chart_of_accounts_id' => 7, 'debit' => 0, 'credit' => 7000], // Owner’s Capital
                 ],
             ],
             [
                 'date' => Carbon::now()->subDays(3),
                 'description' => 'Service Revenue Earned',
                 'details' => [
-                    ['account_id' => 4, 'debit' => 5000, 'credit' => 0], // Accounts Receivable
-                    ['account_id' => 8, 'debit' => 0, 'credit' => 5000], // Service Revenue
+                    ['chart_of_accounts_id' => 4, 'debit' => 5000, 'credit' => 0], // Accounts Receivable
+                    ['chart_of_accounts_id' => 8, 'debit' => 0, 'credit' => 5000], // Service Revenue
                 ],
             ],
             [
                 'date' => Carbon::now()->subDays(2),
                 'description' => 'Partial Payment Received from Client',
                 'details' => [
-                    ['account_id' => 3, 'debit' => 2500, 'credit' => 0], // Cash
-                    ['account_id' => 4, 'debit' => 0, 'credit' => 2500], // Accounts Receivable
+                    ['chart_of_accounts_id' => 3, 'debit' => 2500, 'credit' => 0], // Cash
+                    ['chart_of_accounts_id' => 4, 'debit' => 0, 'credit' => 2500], // Accounts Receivable
                 ],
             ],
             [
-                'date' => Carbon::now()->subDays(1),
-                'description' => 'Utility Bill Payment',
+                'date' => Carbon::now()->subDays(40),
+                'description' => 'Purchase of Office Furniture',
                 'details' => [
-                    ['account_id' => 20, 'debit' => 700, 'credit' => 0], // Utilities Expense (bisa diganti dengan Utilities Expense)
-                    ['account_id' => 3, 'debit' => 0, 'credit' => 700], // Cash
+                    ['chart_of_accounts_id' => 1, 'debit' => 1200, 'credit' => 0], // Fixed Assets (Bank BNI)
+                    ['chart_of_accounts_id' => 17, 'debit' => 0, 'credit' => 1200], // Accounts Payable
                 ],
             ],
             [
-                'date' => Carbon::now()->subDays(1),
-                'description' => 'Utility Bill Payment',
+                'date' => Carbon::now()->subDays(39),
+                'description' => 'Payment for Office Furniture',
                 'details' => [
-                    ['account_id' => 20, 'debit' => 700, 'credit' => 0], // Biaya Utilitas
-                    ['account_id' => 3,  'debit' => 0, 'credit' => 700], // Kas
+                    ['chart_of_accounts_id' => 17, 'debit' => 1200, 'credit' => 0], // Accounts Payable
+                    ['chart_of_accounts_id' => 3, 'debit' => 0, 'credit' => 1200], // Cash on Hand
                 ],
             ],
             [
-                'date' => Carbon::now()->subDays(2),
-                'description' => 'Salary Payment',
+                'date' => Carbon::now()->subDays(38),
+                'description' => 'Revenue from Consulting Services',
                 'details' => [
-                    ['account_id' => 9, 'debit' => 5000, 'credit' => 0], // Gaji
-                    ['account_id' => 3, 'debit' => 0, 'credit' => 5000], // Kas
+                    ['chart_of_accounts_id' => 3, 'debit' => 1500, 'credit' => 0], // Cash on Hand
+                    ['chart_of_accounts_id' => 14, 'debit' => 0, 'credit' => 1500], // Consulting Revenue
                 ],
             ],
             [
-                'date' => Carbon::now()->subDays(3),
-                'description' => 'Service Revenue Received',
+                'date' => Carbon::now()->subDays(37),
+                'description' => 'Payment of Marketing Expenses',
                 'details' => [
-                    ['account_id' => 3, 'debit' => 3000, 'credit' => 0], // Kas
-                    ['account_id' => 8, 'debit' => 0, 'credit' => 3000], // Pendapatan Jasa
+                    ['chart_of_accounts_id' => 16, 'debit' => 600, 'credit' => 0], // Marketing Expenses
+                    ['chart_of_accounts_id' => 3, 'debit' => 0, 'credit' => 600], // Cash on Hand
                 ],
             ],
             [
-                'date' => Carbon::now()->subDays(4),
-                'description' => 'Purchase Office Supplies',
+                'date' => Carbon::now()->subDays(36),
+                'description' => 'Purchase of Computer Equipment',
                 'details' => [
-                    ['account_id' => 10, 'debit' => 150, 'credit' => 0], // Perlengkapan Kantor
-                    ['account_id' => 3,  'debit' => 0, 'credit' => 150], // Kas
+                    ['chart_of_accounts_id' => 1, 'debit' => 2500, 'credit' => 0], // Fixed Assets (Bank BNI)
+                    ['chart_of_accounts_id' => 17, 'debit' => 0, 'credit' => 2500], // Accounts Payable
                 ],
             ],
             [
-                'date' => Carbon::now()->subDays(5),
-                'description' => 'Loan Received from Bank',
+                'date' => Carbon::now()->subDays(35),
+                'description' => 'Payment for Computer Equipment',
                 'details' => [
-                    ['account_id' => 1, 'debit' => 10000, 'credit' => 0], // Bank Mandiri
-                    ['account_id' => 5, 'debit' => 0, 'credit' => 10000], // Hutang Jangka Pendek
+                    ['chart_of_accounts_id' => 17, 'debit' => 2500, 'credit' => 0], // Accounts Payable
+                    ['chart_of_accounts_id' => 3, 'debit' => 0, 'credit' => 2500], // Cash on Hand
                 ],
             ],
-
+            [
+                'date' => Carbon::now()->subDays(34),
+                'description' => 'Interest Income from Investments',
+                'details' => [
+                    ['chart_of_accounts_id' => 3, 'debit' => 200, 'credit' => 0], // Cash on Hand
+                    ['chart_of_accounts_id' => 15, 'debit' => 0, 'credit' => 200], // Interest Income
+                ],
+            ],
+            [
+                'date' => Carbon::now()->subDays(33),
+                'description' => 'Payment of Office Rent',
+                'details' => [
+                    ['chart_of_accounts_id' => 5, 'debit' => 800, 'credit' => 0], // Rent Expense
+                    ['chart_of_accounts_id' => 3, 'debit' => 0, 'credit' => 800], // Cash on Hand
+                ],
+            ],
+            [
+                'date' => Carbon::now()->subDays(32),
+                'description' => 'Revenue from Product Sales',
+                'details' => [
+                    ['chart_of_accounts_id' => 3, 'debit' => 3000, 'credit' => 0], // Cash on Hand
+                    ['chart_of_accounts_id' => 8, 'debit' => 0, 'credit' => 3000], // Product Sales
+                ],
+            ],
+            [
+                'date' => Carbon::now()->subDays(31),
+                'description' => 'Payment of Administrative Expenses',
+                'details' => [
+                    ['chart_of_accounts_id' => 18, 'debit' => 400, 'credit' => 0], // Administrative Expenses
+                    ['chart_of_accounts_id' => 3, 'debit' => 0, 'credit' => 400], // Cash on Hand
+                ],
+            ],
+            [
+                'date' => Carbon::now()->subDays(30),
+                'description' => 'Purchase of Office Supplies',
+                'details' => [
+                    ['chart_of_accounts_id' => 10, 'debit' => 300, 'credit' => 0], // Office Supplies
+                    ['chart_of_accounts_id' => 17, 'debit' => 0, 'credit' => 300], // Accounts Payable
+                ],
+            ],
+            [
+                'date' => Carbon::now()->subDays(29),
+                'description' => 'Payment to Supplier for Office Supplies',
+                'details' => [
+                    ['chart_of_accounts_id' => 17, 'debit' => 300, 'credit' => 0], // Accounts Payable
+                    ['chart_of_accounts_id' => 3, 'debit' => 0, 'credit' => 300], // Cash on Hand
+                ],
+            ],
+            [
+                'date' => Carbon::now()->subDays(28),
+                'description' => 'Depreciation of Office Equipment',
+                'details' => [
+                    ['chart_of_accounts_id' => 1, 'debit' => 0, 'credit' => 150], // Fixed Assets (Depreciation)
+                    ['chart_of_accounts_id' => 9, 'debit' => 150, 'credit' => 0], // Depreciation Expense
+                ],
+            ],
+            [
+                'date' => Carbon::now()->subDays(27),
+                'description' => 'Payment of Utilities',
+                'details' => [
+                    ['chart_of_accounts_id' => 17, 'debit' => 250, 'credit' => 0], // Utilities Expense
+                    ['chart_of_accounts_id' => 3, 'debit' => 0, 'credit' => 250], // Cash on Hand
+                ],
+            ],
+            [
+                'date' => Carbon::now()->subDays(26),
+                'description' => 'Revenue from Service Fees',
+                'details' => [
+                    ['chart_of_accounts_id' => 3, 'debit' => 1200, 'credit' => 0], // Cash on Hand
+                    ['chart_of_accounts_id' => 14, 'debit' => 0, 'credit' => 1200], // Consulting Revenue
+                ],
+            ],
+            [
+                'date' => Carbon::now()->subDays(25),
+                'description' => 'Payment of Advertising Expenses',
+                'details' => [
+                    ['chart_of_accounts_id' => 16, 'debit' => 500, 'credit' => 0], // Advertising Expense
+                    ['chart_of_accounts_id' => 3, 'debit' => 0, 'credit' => 500], // Cash on Hand
+                ],
+            ],
+            [
+                'date' => Carbon::now()->subDays(24),
+                'description' => 'Purchase of Inventory',
+                'details' => [
+                    ['chart_of_accounts_id' => 4, 'debit' => 1000, 'credit' => 0], // Accounts Receivable
+                    ['chart_of_accounts_id' => 17, 'debit' => 0, 'credit' => 1000], // Accounts Payable
+                ],
+            ],
+            [
+                'date' => Carbon::now()->subDays(23),
+                'description' => 'Payment for Inventory',
+                'details' => [
+                    ['chart_of_accounts_id' => 17, 'debit' => 1000, 'credit' => 0], // Accounts Payable
+                    ['chart_of_accounts_id' => 3, 'debit' => 0, 'credit' => 1000], // Cash on Hand
+                ],
+            ],
+            [
+                'date' => Carbon::now()->subDays(22),
+                'description' => 'Dividend Paid to Shareholders',
+                'details' => [
+                    ['chart_of_accounts_id' => 7, 'debit' => 2000, 'credit' => 0], // Owner Capital
+                    ['chart_of_accounts_id' => 3, 'debit' => 0, 'credit' => 2000], // Cash on Hand
+                ],
+            ],
+            [
+                'date' => Carbon::now()->subDays(21),
+                'description' => 'Payment of Loan Principal',
+                'details' => [
+                    ['chart_of_accounts_id' => 5, 'debit' => 1000, 'credit' => 0], // Short-term Loans
+                    ['chart_of_accounts_id' => 3, 'debit' => 0, 'credit' => 1000], // Cash on Hand
+                ],
+            ],
         ];
 
         foreach ($entries as $entry) {
@@ -149,7 +260,7 @@ class JournalEntrySeeder extends Seeder
             foreach ($entry['details'] as $detail) {
                 DB::table('journal_entry_details')->insert([
                     'journal_entry_id' => $journalEntryId,
-                    'account_id' => $detail['account_id'],
+                    'chart_of_accounts_id' => $detail['chart_of_accounts_id'],
                     'debit' => $detail['debit'],
                     'credit' => $detail['credit'],
                     'created_at' => now(),

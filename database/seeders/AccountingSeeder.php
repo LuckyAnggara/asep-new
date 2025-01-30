@@ -33,6 +33,15 @@ class AccountingSeeder extends Seeder
             ['category_id' => 4, 'code' => '4-01', 'name' => 'Sales Revenue', 'description' => 'Sub-category for sales revenue'],
             ['category_id' => 5, 'code' => '5-01', 'name' => 'Operating Expenses', 'description' => 'Sub-category for operating expenses'],
             ['category_id' => 5, 'code' => '5-02', 'name' => 'Administrative Expenses', 'description' => 'Sub-category for administrative expenses'],
+            ['category_id' => 1, 'code' => '1-03', 'name' => 'Intangible Assets', 'description' => 'Sub-category for intangible assets'],
+            ['category_id' => 1, 'code' => '1-04', 'name' => 'Investments', 'description' => 'Sub-category for investments'],
+            ['category_id' => 2, 'code' => '2-03', 'name' => 'Accrued Liabilities', 'description' => 'Sub-category for accrued liabilities'],
+            ['category_id' => 2, 'code' => '2-04', 'name' => 'Deferred Revenue', 'description' => 'Sub-category for deferred revenue'],
+            ['category_id' => 3, 'code' => '3-02', 'name' => 'Retained Earnings', 'description' => 'Sub-category for retained earnings'],
+            ['category_id' => 4, 'code' => '4-02', 'name' => 'Service Revenue', 'description' => 'Sub-category for service revenue'],
+            ['category_id' => 4, 'code' => '4-03', 'name' => 'Interest Income', 'description' => 'Sub-category for interest income'],
+            ['category_id' => 5, 'code' => '5-03', 'name' => 'Marketing Expenses', 'description' => 'Sub-category for marketing expenses'],
+            ['category_id' => 5, 'code' => '5-04', 'name' => 'Utilities Expense', 'description' => 'Sub-category for utilities expense'],
         ];
         DB::table('account_sub_categories')->insert($subCategories);
 
@@ -48,6 +57,15 @@ class AccountingSeeder extends Seeder
             ['sub_category_id' => 6, 'code' => '4-01-001', 'name' => 'Product Sales', 'account_number' => '008', 'description' => 'Revenue from product sales'],
             ['sub_category_id' => 7, 'code' => '5-01-001', 'name' => 'Salaries Expense', 'account_number' => '009', 'description' => 'Expense for employee salaries'],
             ['sub_category_id' => 8, 'code' => '5-02-001', 'name' => 'Office Supplies', 'account_number' => '010', 'description' => 'Expense for office supplies'],
+            ['sub_category_id' => 9, 'code' => '1-03-001', 'name' => 'Patents', 'account_number' => '011', 'description' => 'Intangible assets for patents'],
+            ['sub_category_id' => 10, 'code' => '1-04-001', 'name' => 'Stock Investments', 'account_number' => '012', 'description' => 'Investments in stocks'],
+            ['sub_category_id' => 11, 'code' => '2-03-001', 'name' => 'Accrued Wages', 'account_number' => '013', 'description' => 'Accrued wages payable'],
+            ['sub_category_id' => 12, 'code' => '2-04-001', 'name' => 'Deferred Service Revenue', 'account_number' => '014', 'description' => 'Revenue received in advance'],
+            ['sub_category_id' => 13, 'code' => '3-02-001', 'name' => 'Retained Earnings - Current Year', 'account_number' => '015', 'description' => 'Retained earnings for the current year'],
+            ['sub_category_id' => 14, 'code' => '4-02-001', 'name' => 'Consulting Revenue', 'account_number' => '016', 'description' => 'Revenue from consulting services'],
+            ['sub_category_id' => 15, 'code' => '4-03-001', 'name' => 'Interest on Savings', 'account_number' => '017', 'description' => 'Interest income from savings accounts'],
+            ['sub_category_id' => 16, 'code' => '5-03-001', 'name' => 'Advertising Expense', 'account_number' => '018', 'description' => 'Expense for advertising'],
+            ['sub_category_id' => 17, 'code' => '5-04-001', 'name' => 'Electricity Expense', 'account_number' => '019', 'description' => 'Expense for electricity'],
         ];
         DB::table('chart_of_accounts')->insert($chartOfAccounts);
     }

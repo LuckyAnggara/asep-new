@@ -1,9 +1,10 @@
 <template>
     <AuthenticatedLayout>
         <div class="flex items-center">
-            <h1 class="text-lg font-semibold md:text-2xl">Tambah Data</h1>
+            <h1 class="text-lg font-semibold md:text-2xl">Detail Data</h1>
         </div>
         <div
+            v-auto-animate
             class="flex flex-col items-start rounded-lg border border-dashed p-6 shadow-sm lg:flex-row lg:space-x-6"
         >
             <form class="w-full space-y-4 lg:w-1/3">
@@ -11,6 +12,7 @@
                 <div class="grid gap-2">
                     <Label for="reference">Referensi</Label>
                     <Input
+                        :readonly="!isEdit"
                         id="reference"
                         v-model="form.reference"
                         type="text"
@@ -22,6 +24,7 @@
                 <div class="grid gap-2">
                     <Label for="description">Deskripsi</Label>
                     <Textarea
+                        :readonly="!isEdit"
                         v-model="form.description"
                         class="resize-none"
                         placeholder="Masukkan Deskripsi"
@@ -32,6 +35,7 @@
                 <div class="grid gap-2">
                     <Label for="date">Tanggal</Label>
                     <VueDatePicker
+                        :readonly="!isEdit"
                         :preview-format="'dd/MMM/yyyy'"
                         :format="'dd MMMM yyyy'"
                         auto-apply
@@ -42,7 +46,7 @@
                 </div>
 
                 <!-- File Upload -->
-                <div class="grid gap-2">
+                <div class="grid-2 grid gap-1.5" v-if="!data.attachment">
                     <Label for="file_upload">Lampiran</Label>
                     <Input
                         id="file_upload"
@@ -50,20 +54,59 @@
                         @change="handleFileUpload"
                     />
                 </div>
+                <div v-else class="flex flex-row items-center justify-between">
+                    <a
+                        :href="`/storage/${data.attachment}`"
+                        class="flex cursor-pointer flex-row space-x-1"
+                        target="_blank"
+                    >
+                        <span class="text-blue-600 underline"> Lampiran </span>
+                        <ExternalLink :size="16" :stroke-width="1.25" />
+                    </a>
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        @click="removeLampiran()"
+                    >
+                        <Trash2 :size="16" :stroke-width="1.25" />
+                    </Button>
+                </div>
 
                 <!-- Submit Button -->
                 <Button
+                    v-if="!isEdit"
                     type="button"
-                    @click="openAlertDialog = true"
+                    @click="isEdit = true"
                     :disabled="onProses"
                 >
-                    <span v-if="onProses" class="flex">
-                        <ReloadIcon class="mr-2 h-4 w-4 animate-spin" />
-                        Please wait
-                    </span>
-
-                    <span v-else>Submit</span>
+                    <FilePenLine /> <span class="mr-2">Edit</span>
                 </Button>
+                <div v-else class="flex flex-row space-x-2">
+                    <Button
+                        type="button"
+                        @click="
+                            isEdit = false;
+                            form.reset();
+                        "
+                        :disabled="onProses"
+                        variant="outline"
+                    >
+                        <span>Cancel</span>
+                    </Button>
+                    <Button
+                        type="button"
+                        @click="openAlertDialog = true"
+                        :disabled="onProses"
+                    >
+                        <span v-if="onProses" class="flex">
+                            <ReloadIcon class="mr-2 h-4 w-4 animate-spin" />
+                            Please wait
+                        </span>
+
+                        <span v-else>Update</span>
+                    </Button>
+                </div>
             </form>
             <div class="flex w-2/3 flex-col space-y-4">
                 <div class="flex items-center">
@@ -72,7 +115,11 @@
                     </span>
                 </div>
                 <div class="flex flex-col space-y-2">
-                    <Button class="w-fit" type="button" @click="addDetail"
+                    <Button
+                        class="w-fit"
+                        type="button"
+                        @click="addDetail"
+                        :class="isEdit ? 'block' : 'hidden'"
                         >Tambah</Button
                     >
                     <Table>
@@ -81,20 +128,22 @@
                                 <TableHead class="w-5/12">Nama Akun</TableHead>
                                 <TableHead class="w-3/12">Debit</TableHead>
                                 <TableHead class="w-3/12">Credit</TableHead>
-                                <TableHead class="w-1/12"></TableHead>
+                                <TableHead
+                                    class="hidden w-1/12"
+                                    :class="isEdit ? 'hidden' : 'block'"
+                                ></TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             <TableRow
                                 v-for="(item, i) in form.details"
-                                :key="item.account_id"
+                                :key="item.chart_of_accounts_id"
                             >
                                 <TableCell>
-                                    <!-- <SelectAccount
-                                    :data="accounts"
-                                    @sendData="(x) => setData(x, i)"
-                                /> -->
-                                    <Select v-model="item.account_id">
+                                    <Select
+                                        :disabled="!isEdit"
+                                        v-model="item.chart_of_accounts_id"
+                                    >
                                         <SelectTrigger>
                                             <SelectValue
                                                 placeholder="Select a fruit"
@@ -116,12 +165,46 @@
                                     </Select>
                                 </TableCell>
                                 <TableCell>
-                                    <Input v-model="item.debit" />
+                                    <NumberField
+                                        :disabled="!isEdit"
+                                        v-model="item.debit"
+                                        :default-value="0"
+                                        :format-options="{
+                                            style: 'currency',
+                                            currency: 'IDR',
+                                            currencyDisplay: 'code',
+                                            currencySign: 'accounting',
+                                        }"
+                                    >
+                                        <NumberFieldContent>
+                                            <NumberFieldInput />
+                                        </NumberFieldContent>
+                                    </NumberField>
                                 </TableCell>
                                 <TableCell>
-                                    <Input v-model="item.credit" />
+                                    <NumberField
+                                        :disabled="!isEdit"
+                                        v-model="item.credit"
+                                        :default-value="0"
+                                        :format-options="{
+                                            style: 'currency',
+                                            currency: 'IDR',
+                                            currencyDisplay: 'code',
+                                            currencySign: 'accounting',
+                                        }"
+                                    >
+                                        <NumberFieldContent>
+                                            <NumberFieldInput />
+                                        </NumberFieldContent>
+                                    </NumberField>
+                                    <!-- <Input
+                                        v-model="item.credit"
+                                        :readonly="!isEdit"
+                                    /> -->
                                 </TableCell>
-                                <TableCell>
+                                <TableCell
+                                    :class="!isEdit ? 'hidden' : 'block'"
+                                >
                                     <Button
                                         @click="removeDetail(i)"
                                         variant="ghost"
@@ -159,7 +242,7 @@
                 <AlertDialogHeader>
                     <AlertDialogTitle>Confirmation</AlertDialogTitle>
                     <AlertDialogDescription>
-                        Data Anda akan dikirim. Periksa kembali apakah semuanya
+                        Data Anda akan diupdate. Periksa kembali apakah semuanya
                         sudah sesuai. Lanjutkan?
                     </AlertDialogDescription>
                 </AlertDialogHeader>
@@ -181,10 +264,18 @@
 
 <script setup>
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue';
+import { vAutoAnimate } from '@formkit/auto-animate';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import SelectAccount from '@/components/SelectAccount.vue';
 import { Separator } from '@/components/ui/separator';
+import {
+    NumberField,
+    NumberFieldContent,
+    NumberFieldDecrement,
+    NumberFieldIncrement,
+    NumberFieldInput,
+} from '@/components/ui/number-field';
 import {
     Select,
     SelectContent,
@@ -223,7 +314,7 @@ import { computed, reactive, ref } from 'vue';
 import { useForm, router, usePage } from '@inertiajs/vue3';
 import { useColorMode } from '@vueuse/core';
 import ReusableTable from '@/components/ReusableTable.vue';
-import { Trash2 } from 'lucide-vue-next';
+import { ExternalLink, FilePenLine, Trash2, X } from 'lucide-vue-next';
 import { ReloadIcon } from '@radix-icons/vue';
 import { useToast } from '@/components/ui/toast';
 
@@ -231,27 +322,39 @@ const { toast } = useToast();
 const mode = useColorMode();
 const page = usePage();
 const props = defineProps({
+    journal_entry: Object,
     accounts: Array, // Daftar akun dari backend
 });
+
+const data = computed(() => props.journal_entry);
 const onProses = ref(false);
 const openAlertDialog = ref(false);
 const fileError = ref(false);
+
 const form = useForm({
-    date: '',
-    reference: '',
-    description: '',
-    attachment: '',
-    details: [{ account_id: '', name: '', code: '', debit: 0, credit: 0 }],
+    id: props.journal_entry.id,
+    reference: props.journal_entry.reference,
+    date: props.journal_entry.date,
+    description: props.journal_entry.description,
+    attachment: null, // Hanya untuk file baru
+    details: props.journal_entry.details.map((detail) => ({
+        id: detail.id,
+        chart_of_accounts_id: detail.chart_of_accounts_id,
+        debit: detail.debit,
+        credit: detail.credit,
+    })),
 });
 
+console.info(props.journal_entry);
+console.info(data.value);
 function setData(item, index) {
     form.details[index].code = item.code;
-    form.details[index].account_id = item.id;
+    form.details[index].chart_of_accounts_id = item.id;
 }
 
 const addDetail = () => {
     form.details.push({
-        account_id: '',
+        chart_of_accounts_id: '',
         name: '',
         code: '',
         debit: 0,
@@ -266,14 +369,14 @@ const removeDetail = (index) => {
 };
 
 const totalDebit = computed(() => {
-    return form.details.reduce(
+    return form.details?.reduce(
         (sum, item) => sum + (parseFloat(item.debit) || 0),
         0,
     );
 });
 
 const totalCredit = computed(() => {
-    return form.details.reduce(
+    return form.details?.reduce(
         (sum, item) => sum + (parseFloat(item.credit) || 0),
         0,
     );
@@ -283,6 +386,7 @@ const onSubmit = () => {
     const formData = new FormData();
 
     // Append form values to FormData
+    formData.append('_method', 'put');
     formData.append('reference', form.reference || '');
     formData.append(
         'date',
@@ -294,7 +398,7 @@ const onSubmit = () => {
     form.details.forEach((detail, index) => {
         formData.append(
             `details[${index}][chart_of_accounts_id]`,
-            detail.account_id || '',
+            detail.chart_of_accounts_id || '',
         );
         formData.append(`details[${index}][name]`, detail.name || '');
         formData.append(`details[${index}][code]`, detail.code || '');
@@ -306,11 +410,9 @@ const onSubmit = () => {
         formData.append('attachment', form.attachment);
     }
     // form.post(route('members.store'), {
-    router.visit('/accounting/journal-entries', {
+    router.post(`/accounting/journal-entries/${form.id}`, formData, {
         _token: page.props.csrf_token,
-        method: 'post',
         preserveState: true,
-        data: formData,
         replace: true,
         async: true,
         forceFormData: true,
@@ -321,7 +423,7 @@ const onSubmit = () => {
         onSuccess: () => {
             toast({
                 title: 'Success',
-                description: `Data berhasil di simpan`,
+                description: `Data berhasil di update`,
             });
         },
         onProgress: () => {
@@ -354,4 +456,11 @@ const handleFileUpload = (event) => {
         form.attachment = selectedFile;
     }
 };
+
+// Edit
+const isEdit = ref(false);
+
+function removeLampiran() {
+    data.value.attachment = null;
+}
 </script>

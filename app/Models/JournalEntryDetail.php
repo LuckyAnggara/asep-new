@@ -9,7 +9,12 @@ class JournalEntryDetail extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['journal_entry_id', 'account_id', 'debit', 'credit'];
+    protected $fillable = ['journal_entry_id', 'chart_of_accounts_id', 'debit', 'credit'];
+    protected $casts = [
+        'chart_of_accounts_id' => 'string',
+        'debit' => 'double',
+        'credit' => 'double',
+    ];
 
     public function journalEntry()
     {

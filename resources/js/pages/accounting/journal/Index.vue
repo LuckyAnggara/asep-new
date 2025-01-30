@@ -8,7 +8,7 @@
         >
             <div class="flex-1 flex-col items-center justify-center">
                 <Button class="mb-4"
-                    ><Link :href="route('journal-entries.create')" as="span"
+                    ><Link :href="route('journal-entries.create')" as="button"
                         >Tambah Data</Link
                     ></Button
                 >
@@ -100,14 +100,14 @@ const filtering = reactive([
     },
 ]);
 
-console.info(route());
-
 const actions = ref([
     {
         label: 'Detail',
         handler: (item) => {
-            editData.value = item;
-            isEditOpen.value = true;
+            router.visit(route('journal-entries.edit', item.id), {
+                async: true,
+                preserveState: true,
+            });
         },
     },
     {
@@ -124,6 +124,4 @@ const isEditOpen = ref(false);
 const isDeleteDialogOpen = ref(false);
 const deleteId = ref(null);
 const editData = ref({});
-
-function toCreate() {}
 </script>

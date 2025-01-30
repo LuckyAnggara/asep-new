@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('journal_entry_details', function (Blueprint $table) {
             $table->id();
             $table->foreignId('journal_entry_id')->constrained()->onDelete('cascade'); // Relasi ke journal_entries
-            $table->foreignId('account_id'); // Relasi ke akun (nanti buat tabel accounts)
+            $table->foreignId('chart_of_accounts_id')->constrained()->onDelete('cascade'); // Relasi ke akun (nanti buat tabel accounts)
             $table->decimal('debit', 15, 2)->default(0); // Jumlah debit
             $table->decimal('credit', 15, 2)->default(0); // Jumlah kredit
             $table->timestamps();
