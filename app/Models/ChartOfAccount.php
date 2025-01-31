@@ -13,8 +13,7 @@ class ChartOfAccount extends Model
     protected $fillable = ['sub_category_id', 'code', 'name', 'account_number', 'description'];
 
     protected $casts = [
-        'sub_category_id' => 'string',
-        'id' => 'string'
+        'sub_category_id' => 'string'
     ];
 
     protected function name(): Attribute
