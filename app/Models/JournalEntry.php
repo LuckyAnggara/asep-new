@@ -28,6 +28,6 @@ class JournalEntry extends Model
 
     public function getTotalNominalAttribute()
     {
-        return $this->details->sum(fn($detail) => $detail->debit + $detail->credit);
+        return $this->details->sum(fn($detail) => $detail->debit);
     }
 }

@@ -3,6 +3,7 @@
 use App\Http\Controllers\AccountCategoryController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AccountSubCategoryController;
+use App\Http\Controllers\BalanceSheetController;
 use App\Http\Controllers\ChartOfAccountController;
 use App\Http\Controllers\JournalEntryController;
 use App\Http\Controllers\LedgerController;
@@ -48,6 +49,8 @@ Route::resource('accounting/journal-entries', JournalEntryController::class)
     ->middleware(['auth', 'verified']);
 
 Route::resource('accounting/ledger', LedgerController::class)->only(['index'])
+    ->middleware(['auth', 'verified']);
+Route::resource('accounting/balance-sheet', BalanceSheetController::class)->only(['index'])
     ->middleware(['auth', 'verified']);
 
 

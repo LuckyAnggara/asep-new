@@ -35,7 +35,6 @@ class JournalEntryController extends Controller
             if ($month == 'all') {
                 return $query;
             }
-
             return $query
                 ->whereMonth('date', $month);
         })->when($date, function ($query, $date) {
@@ -48,6 +47,7 @@ class JournalEntryController extends Controller
             return $query
                 ->whereDate('date', $date);
         })->orderBy('date', 'desc')->paginate($limit);
+
         return Inertia::render('accounting/journal/Index', [
             'journal_entries' => $journalEntries
         ]);

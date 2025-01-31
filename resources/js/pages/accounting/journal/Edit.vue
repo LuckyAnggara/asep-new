@@ -74,38 +74,45 @@
                 </div>
 
                 <!-- Submit Button -->
-                <Button
-                    v-if="!isEdit"
-                    type="button"
-                    @click="isEdit = true"
-                    :disabled="onProses"
-                >
-                    <FilePenLine /> <span class="mr-2">Edit</span>
-                </Button>
-                <div v-else class="flex flex-row space-x-2">
+                <div class="flex flex-row space-x-2">
                     <Button
                         type="button"
-                        @click="
-                            isEdit = false;
-                            form.reset();
-                        "
-                        :disabled="onProses"
                         variant="outline"
-                    >
-                        <span>Cancel</span>
-                    </Button>
-                    <Button
-                        type="button"
-                        @click="openAlertDialog = true"
+                        @click="isDeleteDialogOpen = true"
                         :disabled="onProses"
                     >
-                        <span v-if="onProses" class="flex">
-                            <ReloadIcon class="mr-2 h-4 w-4 animate-spin" />
-                            Please wait
-                        </span>
-
-                        <span v-else>Update</span>
+                        <Trash2 /> <span class="mr-2">Hapus</span>
                     </Button>
+                    <Button
+                        v-if="!isEdit"
+                        type="button"
+                        @click="isEdit = true"
+                        :disabled="onProses"
+                    >
+                        <FilePenLine /> <span class="mr-2">Edit</span>
+                    </Button>
+                    <div v-else class="flex flex-row space-x-2">
+                        <Button
+                            type="button"
+                            @click="isEdit = false"
+                            :disabled="onProses"
+                            variant="outline"
+                        >
+                            <span>Cancel</span>
+                        </Button>
+                        <Button
+                            type="button"
+                            @click="openAlertDialog = true"
+                            :disabled="onProses"
+                        >
+                            <span v-if="onProses" class="flex">
+                                <ReloadIcon class="mr-2 h-4 w-4 animate-spin" />
+                                Please wait
+                            </span>
+
+                            <span v-else>Update</span>
+                        </Button>
+                    </div>
                 </div>
             </form>
             <div class="flex w-2/3 flex-col space-y-4">
@@ -259,6 +266,12 @@
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>
+        <DeleteDialog
+            v-model:open="isDeleteDialogOpen"
+            v-model:id="form.id"
+            :route-link="'journal-entries.destroy'"
+            @close="isDeleteDialogOpen = false"
+        />
     </AuthenticatedLayout>
 </template>
 
@@ -309,7 +322,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-
+import DeleteDialog from '@/components/DeleteDialog.vue';
 import { computed, reactive, ref } from 'vue';
 import { useForm, router, usePage } from '@inertiajs/vue3';
 import { useColorMode } from '@vueuse/core';
@@ -319,6 +332,7 @@ import { ReloadIcon } from '@radix-icons/vue';
 import { useToast } from '@/components/ui/toast';
 
 const { toast } = useToast();
+
 const mode = useColorMode();
 const page = usePage();
 const props = defineProps({
@@ -330,6 +344,7 @@ const data = computed(() => props.journal_entry);
 const onProses = ref(false);
 const openAlertDialog = ref(false);
 const fileError = ref(false);
+const isDeleteDialogOpen = ref(false);
 
 const form = useForm({
     id: props.journal_entry.id,
@@ -345,8 +360,6 @@ const form = useForm({
     })),
 });
 
-console.info(props.journal_entry);
-console.info(data.value);
 function setData(item, index) {
     form.details[index].code = item.code;
     form.details[index].chart_of_accounts_id = item.id;

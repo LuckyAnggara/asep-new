@@ -13,6 +13,7 @@ class ChartOfAccount extends Model
     protected $fillable = ['sub_category_id', 'code', 'name', 'account_number', 'description'];
 
     protected $casts = [
+        'id' => 'string',
         'sub_category_id' => 'string'
     ];
 
@@ -25,6 +26,11 @@ class ChartOfAccount extends Model
     }
 
     public function parent()
+    {
+        return $this->belongsTo(AccountSubCategory::class, 'sub_category_id');
+    }
+
+    public function subCategory()
     {
         return $this->belongsTo(AccountSubCategory::class, 'sub_category_id');
     }

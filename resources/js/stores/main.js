@@ -107,7 +107,7 @@ export const useMainStore = defineStore('main', {
                     },
                     {
                         title: 'Balance Sheet',
-                        url: 'chart-of-accounts.index',
+                        url: 'balance-sheet.index',
                     },
                     {
                         title: 'Cash Flow',

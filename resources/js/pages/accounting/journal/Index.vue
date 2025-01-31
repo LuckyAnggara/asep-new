@@ -23,13 +23,6 @@
                 >
                 </ReusableTable>
             </div>
-            <Create v-model="isCreateOpen" @close="isCreateOpen = false" />
-            <Edit
-                v-model:open="isEditOpen"
-                v-model:data="editData"
-                @close="isEditOpen = false"
-                :data="editData"
-            />
             <DeleteDialog
                 v-model:open="isDeleteDialogOpen"
                 v-model:id="deleteId"
@@ -45,8 +38,6 @@ import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue';
 import ReusableTable from '@/components/ReusableTable.vue';
 import { router, Link } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button';
-import Edit from '@/Pages/ChartOfAccounts/components/EditAccount.vue';
-import Create from '@/Pages/ChartOfAccounts/components/CreateAccount.vue';
 import DeleteDialog from '@/components/DeleteDialog.vue';
 import { computed, reactive, ref } from 'vue';
 import { useMainStore } from '@/stores/main';
@@ -120,8 +111,6 @@ const actions = ref([
 ]);
 
 const isCreateOpen = ref(false);
-const isEditOpen = ref(false);
 const isDeleteDialogOpen = ref(false);
 const deleteId = ref(null);
-const editData = ref({});
 </script>
