@@ -1,152 +1,209 @@
 <template>
     <AuthenticatedLayout>
-        <div>
-            <h1 class="mb-4 text-2xl font-bold">Balance Sheet</h1>
-
+        <div class="flex items-center">
+            <h1 class="text-lg font-semibold md:text-2xl">Journal Entry</h1>
+        </div>
+        <div
+            class="flex-1 flex-col items-center justify-center rounded-lg border border-dashed p-6 shadow-sm"
+        >
             <!-- Filter Tanggal -->
-            <div class="mb-4">
-                <label
-                    for="date"
-                    class="block text-sm font-medium text-gray-700"
-                    >Date:</label
-                >
-                <input
-                    type="date"
+            <div class="grid w-fit gap-2">
+                <Label for="reference">Data s.d Tanggal</Label>
+                <VueDatePicker
+                    :preview-format="'dd/MMM/yyyy'"
+                    :format="'dd MMMM yyyy'"
+                    auto-apply
                     v-model="date"
-                    @change="fetchBalanceSheet"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                />
+                    @update:model-value="fetchBalanceSheet"
+                    :enable-time-picker="false"
+                    :dark="mode == 'dark'"
+                ></VueDatePicker>
             </div>
 
-            <!-- Tabel Aset -->
-            <div class="mb-8">
-                <h2 class="mb-2 text-xl font-semibold">Assets</h2>
-                <table class="min-w-full border border-gray-200 bg-white">
-                    <thead>
-                        <tr class="bg-gray-100">
-                            <th class="border px-4 py-2">Account</th>
-                            <th class="border px-4 py-2">Balance</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr
-                            v-for="asset in balanceSheet.assets"
-                            :key="asset.name"
-                        >
-                            <td class="border px-4 py-2">{{ asset.name }}</td>
-                            <td class="border px-4 py-2 text-right">
-                                {{ formatCurrency(asset.balance) }}
-                            </td>
-                        </tr>
-                        <tr class="bg-gray-50">
-                            <td class="border px-4 py-2 font-semibold">
-                                Total Assets
-                            </td>
-                            <td
-                                class="border px-4 py-2 text-right font-semibold"
+            <div class="my-4 flex flex-col space-y-4 xl:w-2/3">
+                <!-- Tabel Aset -->
+
+                <div>
+                    <h2 class="mb-2 text-xl font-semibold">Assets</h2>
+                    <Table class="text-md border">
+                        <TableHeader class="">
+                            <TableRow
+                                class="text-center font-bold uppercase text-black"
                             >
-                                {{ formatCurrency(totalAssets) }}
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+                                <TableHead class="w-1/3">Nama Akun</TableHead>
+                                <TableHead class="w-1/3 text-right"
+                                    >Saldo</TableHead
+                                >
+                            </TableRow>
+                        </TableHeader>
 
-            <!-- Tabel Liabilitas dan Ekuitas -->
-            <div class="grid grid-cols-2 gap-8">
-                <!-- Liabilitas -->
+                        <TableBody>
+                            <TableRow
+                                v-for="asset in balanceSheet.assets"
+                                :key="asset.name"
+                            >
+                                <TableCell> {{ asset.name }}</TableCell>
+                                <TableCell class="border text-right">
+                                    <span v-if="!onProses">
+                                        {{ formatCurrency(asset.balance) }}
+                                    </span>
+                                    <span v-else>
+                                        <Skeleton class="h-5 w-full" />
+                                    </span>
+                                </TableCell>
+                            </TableRow>
+                        </TableBody>
+                        <TableFooter>
+                            <TableRow class="font-bold">
+                                <TableCell class="text-right"
+                                    >Total Assets</TableCell
+                                >
+                                <TableCell class="text-right font-bold">
+                                    <span v-if="!onProses">
+                                        {{ formatCurrency(totalAssets) }}
+                                    </span>
+                                    <span v-else>
+                                        <Skeleton class="h-5 w-full" />
+                                    </span>
+                                </TableCell>
+                            </TableRow>
+                        </TableFooter>
+                    </Table>
+                </div>
+
+                <Table class="border bg-gray-500 text-lg dark:bg-gray-700">
+                    <TableFooter>
+                        <TableRow class="font-bold">
+                            <TableCell class="w-2/3 text-right uppercase"
+                                >Total Assets</TableCell
+                            >
+                            <TableCell class="text-right font-bold">
+                                <span v-if="!onProses">
+                                    {{ formatCurrency(totalAssets) }}
+                                </span>
+                                <span v-else>
+                                    <Skeleton class="h-5 w-full" /> </span
+                            ></TableCell>
+                        </TableRow>
+                    </TableFooter>
+                </Table>
+
+                <!-- Tabel Liabilities -->
+
                 <div>
                     <h2 class="mb-2 text-xl font-semibold">Liabilities</h2>
-                    <table class="min-w-full border border-gray-200 bg-white">
-                        <thead>
-                            <tr class="bg-gray-100">
-                                <th class="border px-4 py-2">Account</th>
-                                <th class="border px-4 py-2">Balance</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr
-                                v-for="liability in balanceSheet.liabilities"
-                                :key="liability.name"
+                    <Table class="text-md border">
+                        <TableHeader class="">
+                            <TableRow
+                                class="text-center font-bold uppercase text-black"
                             >
-                                <td class="border px-4 py-2">
-                                    {{ liability.name }}
-                                </td>
-                                <td class="border px-4 py-2 text-right">
-                                    {{ formatCurrency(liability.balance) }}
-                                </td>
-                            </tr>
-                            <tr class="bg-gray-50">
-                                <td class="border px-4 py-2 font-semibold">
-                                    Total Liabilities
-                                </td>
-                                <td
-                                    class="border px-4 py-2 text-right font-semibold"
+                                <TableHead class="w-1/3">Nama Akun</TableHead>
+                                <TableHead class="w-1/3 text-right"
+                                    >Saldo</TableHead
                                 >
-                                    {{ formatCurrency(totalLiabilities) }}
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            <TableRow
+                                v-for="asset in balanceSheet.liabilities"
+                                :key="asset.name"
+                            >
+                                <TableCell> {{ asset.name }}</TableCell>
+                                <TableCell class="border text-right">
+                                    <span v-if="!onProses">
+                                        {{ formatCurrency(asset.balance) }}
+                                    </span>
+                                    <span v-else>
+                                        <Skeleton class="h-5 w-full" />
+                                    </span>
+                                </TableCell>
+                            </TableRow>
+                        </TableBody>
+                        <TableFooter>
+                            <TableRow class="font-bold">
+                                <TableCell class="text-right"
+                                    >Total Liabilities</TableCell
+                                >
+                                <TableCell class="text-right font-bold">
+                                    <span v-if="!onProses">
+                                        {{ formatCurrency(totalLiabilities) }}
+                                    </span>
+                                    <span v-else>
+                                        <Skeleton class="h-5 w-full" />
+                                    </span>
+                                </TableCell>
+                            </TableRow>
+                        </TableFooter>
+                    </Table>
                 </div>
 
-                <!-- Ekuitas -->
+                <!-- Tabel Equity -->
+
                 <div>
                     <h2 class="mb-2 text-xl font-semibold">Equity</h2>
-                    <table class="min-w-full border border-gray-200 bg-white">
-                        <thead>
-                            <tr class="bg-gray-100">
-                                <th class="border px-4 py-2">Account</th>
-                                <th class="border px-4 py-2">Balance</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr
-                                v-for="equity in balanceSheet.equity"
-                                :key="equity.name"
+                    <Table class="text-md border">
+                        <TableHeader class="">
+                            <TableRow
+                                class="text-center font-bold uppercase text-black"
                             >
-                                <td class="border px-4 py-2">
-                                    {{ equity.name }}
-                                </td>
-                                <td class="border px-4 py-2 text-right">
-                                    {{ formatCurrency(equity.balance) }}
-                                </td>
-                            </tr>
-                            <tr class="bg-gray-50">
-                                <td class="border px-4 py-2 font-semibold">
-                                    Total Equity
-                                </td>
-                                <td
-                                    class="border px-4 py-2 text-right font-semibold"
+                                <TableHead class="w-1/3">Nama Akun</TableHead>
+                                <TableHead class="w-1/3 text-right"
+                                    >Saldo</TableHead
                                 >
-                                    {{ formatCurrency(totalEquity) }}
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Total Liabilitas dan Ekuitas -->
-            <div class="mt-8">
-                <table class="min-w-full border border-gray-200 bg-white">
-                    <tbody>
-                        <tr class="bg-gray-50">
-                            <td class="border px-4 py-2 font-semibold">
-                                Total Liabilities and Equity
-                            </td>
-                            <td
-                                class="border px-4 py-2 text-right font-semibold"
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            <TableRow
+                                v-for="asset in balanceSheet.equity"
+                                :key="asset.name"
                             >
-                                {{
-                                    formatCurrency(
-                                        totalLiabilities + totalEquity,
-                                    )
-                                }}
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                                <TableCell> {{ asset.name }}</TableCell>
+                                <TableCell class="border text-right">
+                                    <span v-if="!onProses">
+                                        {{ formatCurrency(asset.balance) }}
+                                    </span>
+                                    <span v-else>
+                                        <Skeleton class="h-5 w-full" />
+                                    </span>
+                                </TableCell>
+                            </TableRow>
+                        </TableBody>
+                        <TableFooter>
+                            <TableRow class="font-bold">
+                                <TableCell class="text-right"
+                                    >Total Equity</TableCell
+                                >
+                                <TableCell class="text-right font-bold">
+                                    <span v-if="!onProses">
+                                        {{ formatCurrency(totalEquity) }}
+                                    </span>
+                                    <span v-else>
+                                        <Skeleton class="h-5 w-full" /> </span
+                                ></TableCell>
+                            </TableRow>
+                        </TableFooter>
+                    </Table>
+                </div>
+                <Table class="border bg-gray-500 text-lg dark:bg-gray-700">
+                    <TableFooter>
+                        <TableRow class="font-bold">
+                            <TableCell class="w-2/3 text-right uppercase"
+                                >Total Liabilities and Equity</TableCell
+                            >
+                            <TableCell class="text-right font-bold">
+                                <span v-if="!onProses">
+                                    {{
+                                        formatCurrency(
+                                            totalLiabilities + totalEquity,
+                                        )
+                                    }}
+                                </span>
+                                <span v-else>
+                                    <Skeleton class="h-5 w-full" /> </span
+                            ></TableCell>
+                        </TableRow>
+                    </TableFooter>
+                </Table>
             </div>
         </div>
     </AuthenticatedLayout>
@@ -155,13 +212,28 @@
 <script setup>
 import { ref, computed } from 'vue';
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue';
+import { useColorMode } from '@vueuse/core';
 import { router, Link } from '@inertiajs/vue3';
+import Label from '@/components/ui/label/Label.vue';
+import { Skeleton } from '@/components/ui/skeleton';
+import {
+    Table,
+    TableBody,
+    TableCaption,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+    TableFooter,
+} from '@/components/ui/table';
 
+const mode = useColorMode();
 const props = defineProps({
     balanceSheet: Object,
     date: String,
 });
 
+const onProses = ref(false);
 const date = ref(props.date);
 
 const totalAssets = computed(() => {
@@ -198,6 +270,13 @@ const fetchBalanceSheet = () => {
         { date: date.value },
         {
             preserveState: true,
+            async: true,
+            onStart() {
+                onProses.value = true;
+            },
+            onFinish() {
+                onProses.value = false;
+            },
         },
     );
 };

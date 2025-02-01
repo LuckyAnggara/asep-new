@@ -4,7 +4,9 @@ use App\Http\Controllers\AccountCategoryController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AccountSubCategoryController;
 use App\Http\Controllers\BalanceSheetController;
+use App\Http\Controllers\CashFlowController;
 use App\Http\Controllers\ChartOfAccountController;
+use App\Http\Controllers\IncomeStatementController;
 use App\Http\Controllers\JournalEntryController;
 use App\Http\Controllers\LedgerController;
 use App\Http\Controllers\MemberController;
@@ -52,8 +54,10 @@ Route::resource('accounting/ledger', LedgerController::class)->only(['index'])
     ->middleware(['auth', 'verified']);
 Route::resource('accounting/balance-sheet', BalanceSheetController::class)->only(['index'])
     ->middleware(['auth', 'verified']);
-
-
+Route::resource('accounting/cash-flow', CashFlowController::class)->only(['index'])
+    ->middleware(['auth', 'verified']);
+Route::resource('accounting/income-statement', IncomeStatementController::class)->only(['index'])
+    ->middleware(['auth', 'verified']);
 
 
 require __DIR__ . '/auth.php';

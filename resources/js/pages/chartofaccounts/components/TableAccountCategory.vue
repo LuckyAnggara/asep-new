@@ -52,6 +52,7 @@ const columns = ref([
     { label: 'Kode Akun', key: 'code', class: 'w-[180px]' },
     { label: 'Nama Akun', key: 'name' },
     { label: 'Deskripsi', key: 'description' },
+    { label: 'Posisi', key: 'normal' },
 ]);
 
 const isCreateOpen = ref(false);

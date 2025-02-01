@@ -13,7 +13,15 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
-
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 import { Textarea } from '@/components/ui/textarea';
@@ -107,13 +115,34 @@ const onSubmit = () => {
                         />
                     </div>
                     <div class="grid gap-2">
-                        <Label for="name">Nama Sub Kategori Akun</Label>
+                        <Label for="name">Nama Kategori Akun</Label>
                         <Input
                             id="name"
                             v-model="data.name"
                             type="text"
                             placeholder="Isi dengan nama Sub Kategori Akun"
                         />
+                    </div>
+
+                    <div class="grid gap-2">
+                        <Label for="name">Posisi Saldo</Label>
+                        <Select v-model="data.normal">
+                            <SelectTrigger>
+                                <SelectValue
+                                    placeholder="Pilih Kategori Akun"
+                                />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectGroup>
+                                    <SelectItem value="debit">
+                                        Debit
+                                    </SelectItem>
+                                    <SelectItem value="kredit">
+                                        Kredit
+                                    </SelectItem>
+                                </SelectGroup>
+                            </SelectContent>
+                        </Select>
                     </div>
 
                     <div class="grid gap-2">

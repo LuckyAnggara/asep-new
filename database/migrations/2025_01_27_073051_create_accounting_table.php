@@ -17,6 +17,9 @@ return new class extends Migration
             $table->string('code');
             $table->string('name'); // Nama kategori utama
             $table->string('description')->nullable(); // Deskripsi tambahan
+            $table->string(
+                'normal'
+            );
             $table->timestamps();
         });
 

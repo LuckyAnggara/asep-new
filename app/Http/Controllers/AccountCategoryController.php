@@ -53,12 +53,14 @@ class AccountCategoryController extends Controller
             'code' => 'required|string|max:10|unique:account_categories,code',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'normal' => 'required|string|max:255',
         ]);
 
         AccountCategory::create([
             'code' => $request->code,
             'name' => $request->name,
             'description' => $request->description,
+            'normal' => $request->normal,
         ]);
 
         return redirect()->route('chart-of-accounts.index')->with('success', 'Account created successfully.');
@@ -90,6 +92,7 @@ class AccountCategoryController extends Controller
             'code' => 'required|string|max:10|unique:account_categories,code,' . $id,
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'normal' => 'required|string|max:255',
         ]);
         // $account->update($validated);
 
@@ -98,6 +101,7 @@ class AccountCategoryController extends Controller
         $category->code = $request->code;
         $category->name = $request->name;
         $category->description = $request->description;
+        $category->normal = $request->normal;
         $category->save();
 
         return redirect()->route('chart-of-accounts.index')->with('success', 'Account created successfully.');

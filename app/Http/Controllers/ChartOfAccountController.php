@@ -84,7 +84,7 @@ class ChartOfAccountController extends Controller
         $lastCode = ChartOfAccount::where('sub_category_id', $request->sub_category_id)
             ->orderBy('code', 'desc')
             ->first();
-        $subCategoryCode = AccountSubCategory::where('id', $request->sub_category_id)->first();
+        $subCategoryCode = AccountSubCategory::with('category')->where('id', $request->sub_category_id)->first();
 
         // Tentukan kode baru
         $newCode = $lastCode ? intval(explode('-', $lastCode->code)[2]) + 1 : 1;
@@ -95,7 +95,7 @@ class ChartOfAccountController extends Controller
             'sub_category_id' => $request->sub_category_id,
             'code' => $code,
             'name' => $request->name,
-            'account_number' => $newCode,
+            'account_number' => $subCategoryCode->category->id,
             'description' => $request->description,
         ]);
 

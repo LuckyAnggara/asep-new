@@ -23,7 +23,7 @@ class LedgerController extends Controller
             $query = JournalEntryDetail::with('journalEntry')
                 ->select('journal_entry_details.*')
                 ->join('journal_entries', 'journal_entry_details.journal_entry_id', '=', 'journal_entries.id')
-                ->where('journal_entry_details.chart_of_accounts_id', $id)
+                ->where('journal_entry_details.chart_of_accounts_id', $value)
                 ->orderBy('journal_entries.date', 'desc'); // Urutkan dari tanggal terbaru
 
             // Filter berdasarkan rentang tanggal jika ada input date

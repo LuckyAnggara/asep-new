@@ -16,6 +16,11 @@ class JournalEntryDetail extends Model
         'credit' => 'double',
     ];
 
+    public function chartOfAccounts()
+    {
+        return $this->belongsTo(ChartOfAccount::class);
+    }
+
     public function journalEntry()
     {
         return $this->belongsTo(JournalEntry::class);

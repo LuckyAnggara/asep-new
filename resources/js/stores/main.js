@@ -111,7 +111,11 @@ export const useMainStore = defineStore('main', {
                     },
                     {
                         title: 'Cash Flow',
-                        url: 'chart-of-accounts.index',
+                        url: 'cash-flow.index',
+                    },
+                    {
+                        title: 'Income Statement',
+                        url: 'income-statement.index',
                     },
                     {
                         title: 'Account (COA)',

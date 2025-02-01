@@ -47,6 +47,7 @@ const formSchema = toTypedSchema(
     z.object({
         name: z.string().min(2).max(50),
         code: z.string().min(1).max(50),
+        normal: z.string(),
         description: z.string(),
     }),
 );
@@ -124,6 +125,31 @@ const onSubmit = handleSubmit((values) => {
                                     placeholder="Nama Akun"
                                     v-bind="componentField"
                                 />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    </FormField>
+                    <FormField v-slot="{ componentField }" name="normal">
+                        <FormItem>
+                            <FormLabel>Posisi Saldo</FormLabel>
+                            <FormControl>
+                                <Select v-bind="componentField">
+                                    <SelectTrigger>
+                                        <SelectValue
+                                            placeholder="Pilih Kategori Akun"
+                                        />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectGroup>
+                                            <SelectItem value="debit">
+                                                Debit
+                                            </SelectItem>
+                                            <SelectItem value="kredit">
+                                                Kredit
+                                            </SelectItem>
+                                        </SelectGroup>
+                                    </SelectContent>
+                                </Select>
                             </FormControl>
                             <FormMessage />
                         </FormItem>

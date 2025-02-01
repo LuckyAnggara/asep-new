@@ -15,10 +15,10 @@ class BalanceSheetController extends Controller
     {
         // Ambil tanggal dari request (jika ada)
         $date = $request->input('date');
-
+        $date =
+            Carbon::parse($date)->toDateString();
         // Ambil data Balance Sheet
         $balanceSheet = $this->getBalanceSheet($date);
-
         return Inertia::render('accounting/balancesheet/Index', [
             'balanceSheet' => $balanceSheet,
             'date' => $date,
@@ -49,7 +49,17 @@ class BalanceSheetController extends Controller
                 })
                 ->sum('credit');
 
-            $balances[$account->id] = $debit - $credit;
+            // Hitung saldo berdasarkan jenis akun
+            $categoryType = $account->subCategory->category->normal;
+
+            // if (in_array($categoryType, ['debit'])) {
+            if ($categoryType == 'Debit') {
+                // Aset: Debit - Credit (saldo normal di debit)
+                $balances[$account->id] = $debit - $credit;
+            } else {
+                // Liabilitas dan Ekuitas: Credit - Debit (saldo normal di kredit)
+                $balances[$account->id] = $credit - $debit;
+            }
         }
 
         // Kelompokkan akun berdasarkan kategori

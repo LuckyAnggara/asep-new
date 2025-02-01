@@ -65,7 +65,7 @@ class AccountController extends Controller
             'parent_id' => 'nullable|exists:accounts,id',
         ]);
 
-        Account::create($request->only('account_code', 'name', 'type', 'parent_id'));
+        Account::create($request->only('account_code', 'name', 'type', 'parent_id',));
 
         return redirect()->route('accounts.index')->with('success', 'Account created successfully.');
     }

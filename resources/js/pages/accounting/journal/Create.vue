@@ -97,7 +97,7 @@
                                     <Select v-model="item.account_id">
                                         <SelectTrigger>
                                             <SelectValue
-                                                placeholder="Select a fruit"
+                                                placeholder="Pilih Akun"
                                             />
                                         </SelectTrigger>
                                         <SelectContent>
