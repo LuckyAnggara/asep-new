@@ -2,6 +2,7 @@ import { usePage } from '@inertiajs/vue3';
 import {
     BookOpenCheck,
     GalleryVerticalEnd,
+    Settings2,
     SquareTerminal,
     UserCircle2,
 } from 'lucide-vue-next';
@@ -92,6 +93,22 @@ export const useMainStore = defineStore('main', {
                 icon: SquareTerminal,
             },
             {
+                title: 'Member',
+                header: '/members',
+                status: false,
+                icon: UserCircle2,
+                items: [
+                    {
+                        title: 'Data',
+                        url: 'members.index',
+                    },
+                    {
+                        title: 'Baru',
+                        url: 'members.create',
+                    },
+                ],
+            },
+            {
                 title: 'Accounting',
                 icon: BookOpenCheck,
                 status: false,
@@ -105,37 +122,36 @@ export const useMainStore = defineStore('main', {
                         title: 'Ledger',
                         url: 'ledger.index',
                     },
+
                     {
-                        title: 'Balance Sheet',
-                        url: 'balance-sheet.index',
+                        title: 'Income Statement',
+                        url: 'income-statement.index',
                     },
                     {
                         title: 'Cash Flow',
                         url: 'cash-flow.index',
                     },
                     {
-                        title: 'Income Statement',
-                        url: 'income-statement.index',
+                        title: 'Balance Sheet',
+                        url: 'balance-sheet.index',
                     },
+                ],
+            },
+
+            {
+                title: 'Setting',
+                header: '/settings',
+                status: false,
+                icon: Settings2,
+                items: [
                     {
                         title: 'Account (COA)',
                         url: 'chart-of-accounts.index',
                     },
-                ],
-            },
-            {
-                title: 'Member',
-                header: '/members',
-                status: false,
-                icon: UserCircle2,
-                items: [
+
                     {
-                        title: 'Data',
-                        url: 'members.index',
-                    },
-                    {
-                        title: 'Baru',
-                        url: 'members.create',
+                        title: 'Apps',
+                        url: 'settings.index',
                     },
                 ],
             },

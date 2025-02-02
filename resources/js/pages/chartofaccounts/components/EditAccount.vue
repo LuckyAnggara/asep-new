@@ -139,6 +139,32 @@ const onSubmit = () => {
                         </Select>
                     </div>
                     <div class="grid gap-2">
+                        <Label for="email">Tipe Cashflow</Label>
+                        <Select v-model="data.cashflow_type">
+                            <SelectTrigger>
+                                <SelectValue
+                                    placeholder="Pilih Sub Tipe Cashflow"
+                                />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectGroup>
+                                    <SelectItem value="null">
+                                        Tidak ada
+                                    </SelectItem>
+                                    <SelectItem value="operating">
+                                        Operating
+                                    </SelectItem>
+                                    <SelectItem value="financing">
+                                        Financing
+                                    </SelectItem>
+                                    <SelectItem value="investing">
+                                        Investing
+                                    </SelectItem>
+                                </SelectGroup>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div class="grid gap-2">
                         <Label for="name">Nama Akun</Label>
                         <Input
                             id="name"

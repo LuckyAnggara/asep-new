@@ -178,7 +178,9 @@
                                         :default-value="0"
                                         :format-options="{
                                             style: 'currency',
-                                            currency: 'IDR',
+                                            currency:
+                                                page.props.auth.company
+                                                    .currency,
                                             currencyDisplay: 'code',
                                             currencySign: 'accounting',
                                         }"
@@ -195,7 +197,9 @@
                                         :default-value="0"
                                         :format-options="{
                                             style: 'currency',
-                                            currency: 'IDR',
+                                            currency:
+                                                page.props.auth.company
+                                                    .currency,
                                             currencyDisplay: 'code',
                                             currencySign: 'accounting',
                                         }"
@@ -228,14 +232,10 @@
                                     >Total</TableCell
                                 >
                                 <TableCell>{{
-                                    parseFloat(totalDebit).toLocaleString(
-                                        'id-ID',
-                                    )
+                                    formatCurrency(totalDebit)
                                 }}</TableCell>
                                 <TableCell>{{
-                                    parseFloat(totalCredit).toLocaleString(
-                                        'id-ID',
-                                    )
+                                    formatCurrency(totalCredit)
                                 }}</TableCell>
                                 <TableCell></TableCell>
                             </TableRow>
@@ -330,6 +330,7 @@ import ReusableTable from '@/components/ReusableTable.vue';
 import { ExternalLink, FilePenLine, Trash2, X } from 'lucide-vue-next';
 import { ReloadIcon } from '@radix-icons/vue';
 import { useToast } from '@/components/ui/toast';
+import { formatCurrency } from '@/lib/utils';
 
 const { toast } = useToast();
 

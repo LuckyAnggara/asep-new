@@ -12,16 +12,44 @@
                         >Tambah Data</Link
                     ></Button
                 >
-                <ReusableTable
-                    :columns="columns"
-                    :data="journalEntries.data"
-                    :actions="actions"
-                    :route-link="'journal-entries'"
-                    :showing-limit="false"
-                    :searching="true"
-                    :filtering="filtering"
-                >
-                </ReusableTable>
+                <Tabs :default-value="'header'" class="w-full">
+                    <TabsList class="grid w-fit grid-cols-6">
+                        <TabsTrigger value="header"> Header </TabsTrigger>
+                        <TabsTrigger value="detail"> Detail </TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="header">
+                        <div
+                            class="my-5 flex-1 flex-col items-center justify-center"
+                        >
+                            <ReusableTable
+                                :columns="columnMaster"
+                                :data="journalEntries.data"
+                                :actions="actions"
+                                :route-link="'journal-entries'"
+                                :showing-limit="false"
+                                :searching="true"
+                                :filtering="filtering"
+                            >
+                            </ReusableTable>
+                        </div>
+                    </TabsContent>
+                    <TabsContent value="detail">
+                        <div
+                            class="my-5 flex-1 flex-col items-center justify-center"
+                        >
+                            <ReusableTable
+                                :columns="columnDetail"
+                                :data="journalEntryDetails?.data"
+                                :actions="actions"
+                                :route-link="'journal-entries'"
+                                :showing-limit="false"
+                                :searching="true"
+                                :filtering="filtering"
+                            >
+                            </ReusableTable>
+                        </div>
+                    </TabsContent>
+                </Tabs>
             </div>
             <DeleteDialog
                 v-model:open="isDeleteDialogOpen"
@@ -38,16 +66,23 @@ import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue';
 import ReusableTable from '@/components/ReusableTable.vue';
 import { router, Link } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import DeleteDialog from '@/components/DeleteDialog.vue';
 import { computed, reactive, ref } from 'vue';
 import { useMainStore } from '@/stores/main';
 
-const props = defineProps({ journal_entries: Object });
+const props = defineProps({
+    journal_entries: Object,
+    journal_entry_details: Object,
+});
 
 const journalEntries = computed(() => props.journal_entries);
+const journalEntryDetails = computed(() => props.journal_entry_details);
+
+console.info(props.journal_entry_details);
 const mainStore = useMainStore();
 
-const columns = ref([
+const columnMaster = ref([
     {
         label: 'Tanggal Transaksi',
         key: 'date',
@@ -62,6 +97,43 @@ const columns = ref([
     {
         label: 'Tanggal Dibuat',
         key: 'created_at',
+    },
+]);
+
+const columnDetail = ref([
+    {
+        label: 'Tanggal Transaksi',
+        type: 'date',
+        key: 'journal_entry',
+        childKey: 'date',
+    },
+    {
+        label: 'Nama Akun',
+        type: 'string',
+        key: 'chart_of_accounts',
+        childKey: 'name',
+    },
+    {
+        label: 'Debit',
+        type: 'currency',
+        key: 'debit',
+    },
+    {
+        label: 'Credit',
+        type: 'currency',
+        key: 'credit',
+    },
+    {
+        label: 'Referensi',
+        type: 'string',
+        key: 'journal_entry',
+        childKey: 'reference',
+    },
+    {
+        label: 'Deskripsi',
+        type: 'string',
+        key: 'journal_entry',
+        childKey: 'description',
     },
 ]);
 

@@ -6,11 +6,13 @@ use App\Http\Controllers\AccountSubCategoryController;
 use App\Http\Controllers\BalanceSheetController;
 use App\Http\Controllers\CashFlowController;
 use App\Http\Controllers\ChartOfAccountController;
+use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\IncomeStatementController;
 use App\Http\Controllers\JournalEntryController;
 use App\Http\Controllers\LedgerController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SettingsController;
 use App\Models\ChartOfAccount;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -59,5 +61,10 @@ Route::resource('accounting/cash-flow', CashFlowController::class)->only(['index
 Route::resource('accounting/income-statement', IncomeStatementController::class)->only(['index'])
     ->middleware(['auth', 'verified']);
 
+
+Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
+Route::put('/settings/company/{id}', [SettingsController::class, 'updateCompany'])->middleware(['auth', 'verified'])->name('settings.updateCompany');
+Route::put('/settings/preferences/{id}', [SettingsController::class, 'updatePreferences'])->middleware(['auth', 'verified'])->name('settings.updatePreferences');
+Route::put('/settings/security/password', [SettingsController::class, 'updatePassword'])->name('user.updatePassword');
 
 require __DIR__ . '/auth.php';

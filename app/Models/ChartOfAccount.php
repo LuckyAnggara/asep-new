@@ -10,7 +10,7 @@ class ChartOfAccount extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['sub_category_id', 'code', 'name', 'account_number', 'description'];
+    protected $fillable = ['sub_category_id', 'code', 'name', 'account_number', 'description', 'cashflow_type'];
 
     protected $casts = [
         'id' => 'string',

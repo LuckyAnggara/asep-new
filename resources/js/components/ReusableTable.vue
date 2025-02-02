@@ -307,7 +307,7 @@ import { Separator } from '@/components/ui/separator';
 
 import { EllipsisVertical, Search, ListFilter, X } from 'lucide-vue-next';
 import { ReloadIcon } from '@radix-icons/vue';
-import { WhenVisible, router } from '@inertiajs/vue3';
+import { WhenVisible, router, usePage } from '@inertiajs/vue3';
 import { useColorMode, watchDebounced } from '@vueuse/core';
 import { useToast } from '@/components/ui/toast/use-toast';
 
@@ -362,7 +362,7 @@ const props = defineProps({
 });
 const { toast } = useToast();
 const isLoading = ref(false);
-
+const page = usePage();
 const getRowNumber = (index) => {
     if (!props.pagination) return index + 1; // Jika tidak ada pagination, gunakan index biasa
     const { currentPage, itemsPerPage } = props.pagination;
@@ -468,7 +468,7 @@ const formatValue = (item, column) => {
             return value != null
                 ? parseFloat(value).toLocaleString('id-ID', {
                       style: 'currency',
-                      currency: 'IDR',
+                      currency: page.props.auth.company.currency,
                       minimumFractionDigits: 0,
                   })
                 : '-';

@@ -138,14 +138,10 @@
                                     >Total</TableCell
                                 >
                                 <TableCell>{{
-                                    parseFloat(totalDebit).toLocaleString(
-                                        'id-ID',
-                                    )
+                                    formatCurrency(totalDebit)
                                 }}</TableCell>
                                 <TableCell>{{
-                                    parseFloat(totalCredit).toLocaleString(
-                                        'id-ID',
-                                    )
+                                    formatCurrency(totalCredit)
                                 }}</TableCell>
                                 <TableCell></TableCell>
                             </TableRow>
@@ -226,6 +222,7 @@ import ReusableTable from '@/components/ReusableTable.vue';
 import { Trash2 } from 'lucide-vue-next';
 import { ReloadIcon } from '@radix-icons/vue';
 import { useToast } from '@/components/ui/toast';
+import { formatCurrency } from '@/lib/utils';
 
 const { toast } = useToast();
 const mode = useColorMode();

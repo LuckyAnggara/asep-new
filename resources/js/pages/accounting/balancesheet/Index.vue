@@ -215,6 +215,7 @@ import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue';
 import { useColorMode } from '@vueuse/core';
 import { router, Link } from '@inertiajs/vue3';
 import Label from '@/components/ui/label/Label.vue';
+import { formatCurrency } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
     Table,
@@ -256,13 +257,6 @@ const totalEquity = computed(() => {
         0,
     );
 });
-
-const formatCurrency = (value) => {
-    return new Intl.NumberFormat('id-ID', {
-        style: 'currency',
-        currency: 'IDR',
-    }).format(value);
-};
 
 const fetchBalanceSheet = () => {
     router.get(

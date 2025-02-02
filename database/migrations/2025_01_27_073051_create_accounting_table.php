@@ -40,6 +40,7 @@ return new class extends Migration
             $table->string('code');
             $table->string('name'); // Nama akun spesifik
             $table->string('account_number')->unique(); // Nomor akun (opsional)
+            $table->enum('cashflow_type', ['operating', 'investing', 'financing'])->nullable();
             $table->string('description')->nullable(); // Deskripsi tambahan
             $table->timestamps();
         });

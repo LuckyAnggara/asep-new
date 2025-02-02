@@ -97,6 +97,7 @@ class ChartOfAccountController extends Controller
             'name' => $request->name,
             'account_number' => $subCategoryCode->category->id,
             'description' => $request->description,
+            'cashflow_type' => $request->cashflow_type
         ]);
 
         return redirect()->route('chart-of-accounts.index')->with('success', 'Account created successfully.');
@@ -156,6 +157,7 @@ class ChartOfAccountController extends Controller
         $account->sub_category_id = $request->sub_category_id;
         $account->name = $request->name;
         $account->description = $request->description;
+        $account->cashflow_type = $request->cashflow_type;
 
         $account->save();
 

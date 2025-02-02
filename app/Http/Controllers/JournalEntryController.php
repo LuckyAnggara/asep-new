@@ -15,7 +15,7 @@ class JournalEntryController extends Controller
 
     public function index(Request $request)
     {
-        $limit = $request->query('limit', 1000000);
+        // $limit = $request->query('limit', 1000000);
         $search = $request->query('search', ''); // Default adalah string kosong
         $year = $request->query('year', Carbon::now()->format('Y')); // Default adalah string kosong
         $month = $request->query('month', ''); // Default adalah string kosong
@@ -46,10 +46,42 @@ class JournalEntryController extends Controller
 
             return $query
                 ->whereDate('date', $date);
-        })->orderBy('date', 'desc')->paginate($limit);
+        })->orderBy('date', 'desc')->paginate(100000);
+
+        $journalEntryDetail = JournalEntryDetail::with('chartOfAccounts')->with('journalEntry')
+            ->whereHas('journalEntry', function ($query) use ($year, $month, $date, $search) {
+                $query->whereYear('date', $year)->with('details')->when($search, function ($query, $search) {
+                    return $query
+                        ->whereAny(
+                            [
+                                'reference',
+                                'description',
+                            ],
+                            'like',
+                            '%' . $search . '%'
+                        );
+                })->when($month, function ($query, $month) {
+                    if ($month == 'all') {
+                        return $query;
+                    }
+                    return $query
+                        ->whereMonth('date', $month);
+                })->when($date, function ($query, $date) {
+                    $date =
+                        Carbon::parse($date)->toDateString();
+                    if ($date == '') {
+                        return $query;
+                    }
+
+                    return $query
+                        ->whereDate('date', $date);
+                });
+            })->orderBy('id', 'desc')->paginate(100000);
+
 
         return Inertia::render('accounting/journal/Index', [
-            'journal_entries' => $journalEntries
+            'journal_entries' => $journalEntries,
+            'journal_entry_details' => $journalEntryDetail
         ]);
     }
 

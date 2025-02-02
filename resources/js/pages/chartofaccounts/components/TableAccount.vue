@@ -65,6 +65,7 @@ const columns = ref([
         childChildKey: 'name',
     },
     { label: 'Sub Kategori', key: 'parent', childKey: 'name' },
+    { label: 'Tipe Cashflow', key: 'cashflow_type' },
     { label: 'Kode Akun', key: 'code', class: 'w-[120px]' },
     { label: 'Nama Akun', key: 'name' },
     { label: 'Deskripsi', key: 'description' },

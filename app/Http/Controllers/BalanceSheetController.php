@@ -30,10 +30,12 @@ class BalanceSheetController extends Controller
     {
         // Jika tanggal tidak diberikan, gunakan tanggal hari ini
         $endDate = $date ? Carbon::parse($date) : Carbon::now();
+        $startDate = Carbon::now()->startOfYear();
 
         // Ambil semua akun
         $accounts = ChartOfAccount::with(['subCategory.category'])->get();
-
+        $incomeStatementController = new IncomeStatementController();
+        $income = $incomeStatementController->getIncome($startDate, $endDate);
         // Hitung saldo setiap akun
         $balances = [];
         foreach ($accounts as $account) {
@@ -89,6 +91,11 @@ class BalanceSheetController extends Controller
                 ];
             }
         }
+
+        $balanceSheet['equity'][] = [
+            'name' => 'Profit / Loss',
+            'balance' => $income['net_income']
+        ];
 
         return $balanceSheet;
     }

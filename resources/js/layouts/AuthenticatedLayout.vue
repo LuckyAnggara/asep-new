@@ -57,6 +57,7 @@ import { computed } from 'vue';
 const mode = useColorMode();
 const mainStore = useMainStore();
 const page = usePage();
+const company = computed(() => page.props.auth.company);
 // This is sample data.
 const data = computed(() => {
     return {
@@ -64,13 +65,11 @@ const data = computed(() => {
             avatar: 'https://s3.amazonaws.com/37assets/svn/765-default-avatar.png',
             ...page.props.auth.user,
         },
-        company: {
-            name: 'Asep Inc',
-            logo: GalleryVerticalEnd,
-            plan: 'Enterprise',
-        },
     };
 });
+
+const getLogoImage = () =>
+    company.value.logo ? `/storage/${company.value.logo}` : '';
 
 function goTo(url) {
     router.visit(route(url), {
@@ -96,19 +95,20 @@ function active(item) {
                                 <div
                                     class="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg"
                                 >
-                                    <component
+                                    <img :src="getLogoImage()" />
+                                    <!-- <component
                                         :is="data.company.logo"
                                         class="size-4"
-                                    />
+                                    /> -->
                                 </div>
                                 <div
                                     class="grid flex-1 text-left text-sm leading-tight"
                                 >
                                     <span class="truncate font-semibold">{{
-                                        data.company.name
+                                        company.name
                                     }}</span>
                                     <span class="truncate text-xs">{{
-                                        data.company.plan
+                                        company.slogan
                                     }}</span>
                                 </div>
                             </div>

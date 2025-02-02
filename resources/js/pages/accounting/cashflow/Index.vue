@@ -1,3 +1,76 @@
+<script setup>
+import { ref, computed } from 'vue';
+import { usePage, router } from '@inertiajs/vue3';
+import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue';
+import Button from '@/components/ui/button/Button.vue';
+import { useColorMode } from '@vueuse/core';
+import Label from '@/components/ui/label/Label.vue';
+import { formatCurrency } from '@/lib/utils';
+import { Skeleton } from '@/components/ui/skeleton';
+import {
+    Table,
+    TableBody,
+    TableCaption,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+    TableFooter,
+} from '@/components/ui/table';
+
+const page = usePage();
+const props = defineProps({
+    cash_flow: Array,
+});
+const today = new Date();
+const startOfYear = new Date(today.getFullYear(), 0, 1); // 1 Januari tahun ini
+
+const startDate = ref(startOfYear);
+const endDate = ref(today);
+const onProses = ref(false);
+
+// Hitung net per kategori
+const netOperating = computed(
+    () =>
+        props.cash_flow.operating.cash_in - props.cash_flow.operating.cash_out,
+);
+
+const netFinancing = computed(
+    () =>
+        props.cash_flow.financing.cash_in - props.cash_flow.financing.cash_out,
+);
+
+const netInvesting = computed(
+    () =>
+        props.cash_flow.investing.cash_in - props.cash_flow.investing.cash_out,
+);
+
+// Total Net Cash Flow
+const netCashFlow = computed(
+    () => netOperating.value + netFinancing.value + netInvesting.value,
+);
+
+const fetchData = () => {
+    router.get(
+        route('cash-flow.index'),
+        {
+            start_date: startDate.value,
+            end_date: endDate.value,
+        },
+        {
+            preserveState: true,
+            async: true,
+            onStart() {
+                onProses.value = true;
+            },
+            onFinish() {
+                onProses.value = false;
+            },
+        },
+    );
+};
+</script>
+
 <template>
     <AuthenticatedLayout>
         <div class="flex items-center">
@@ -9,268 +82,206 @@
             class="flex-1 flex-col items-center justify-center rounded-lg border border-dashed p-6 shadow-sm"
         >
             <!-- Filter Tanggal -->
-            <div class="mb-4">
-                <label
-                    for="start_date"
-                    class="block text-sm font-medium text-gray-700"
-                    >Start Date:</label
-                >
-                <input
-                    type="date"
-                    v-model="startDate"
-                    @change="fetchCashFlow"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                />
-            </div>
-            <div class="mb-4">
-                <label
-                    for="end_date"
-                    class="block text-sm font-medium text-gray-700"
-                    >End Date:</label
-                >
-                <input
-                    type="date"
-                    v-model="endDate"
-                    @change="fetchCashFlow"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                />
-            </div>
-
-            <!-- Aktivitas Operasi -->
-            <div class="mb-8">
-                <h2 class="mb-2 text-xl font-semibold">Operating Activities</h2>
-                <table class="min-w-full border border-gray-200 bg-white">
-                    <thead>
-                        <tr class="bg-gray-100">
-                            <th class="border px-4 py-2">Account</th>
-                            <th class="border px-4 py-2">Inflow</th>
-                            <th class="border px-4 py-2">Outflow</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr
-                            v-for="activity in cashFlow.operating"
-                            :key="activity.name"
+            <div class="mb-4 flex gap-4">
+                <!-- Filter Tanggal -->
+                <div class="grid w-fit gap-2">
+                    <Label for="reference">Tanggal Data</Label>
+                    <div
+                        class="flex flex-row items-center space-x-4 text-center"
+                    >
+                        <VueDatePicker
+                            :preview-format="'dd/MMM/yyyy'"
+                            :format="'dd MMMM yyyy'"
+                            auto-apply
+                            v-model="startDate"
+                            :enable-time-picker="false"
+                            :dark="mode == 'dark'"
+                        ></VueDatePicker>
+                        <span>s.d</span>
+                        <VueDatePicker
+                            :preview-format="'dd/MMM/yyyy'"
+                            :format="'dd MMMM yyyy'"
+                            auto-apply
+                            v-model="endDate"
+                            :enable-time-picker="false"
+                            :dark="mode == 'dark'"
+                        ></VueDatePicker>
+                        <!-- Submit Button -->
+                        <Button
+                            type="button"
+                            @click="fetchData"
+                            :disabled="onProses"
                         >
-                            <td class="border px-4 py-2">
-                                {{ activity.name }}
-                            </td>
-                            <td class="border px-4 py-2 text-right">
-                                {{ formatCurrency(activity.inflow) }}
-                            </td>
-                            <td class="border px-4 py-2 text-right">
-                                {{ formatCurrency(activity.outflow) }}
-                            </td>
-                        </tr>
-                        <tr class="bg-gray-50">
-                            <td class="border px-4 py-2 font-semibold">
-                                Total Operating Activities
-                            </td>
-                            <td
-                                class="border px-4 py-2 text-right font-semibold"
-                            >
-                                {{ formatCurrency(totalOperatingInflow) }}
-                            </td>
-                            <td
-                                class="border px-4 py-2 text-right font-semibold"
-                            >
-                                {{ formatCurrency(totalOperatingOutflow) }}
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                            <span v-if="onProses" class="flex">
+                                <ReloadIcon class="mr-2 h-4 w-4 animate-spin" />
+                                Please wait
+                            </span>
+
+                            <span v-else>Submit</span>
+                        </Button>
+                    </div>
+                </div>
             </div>
 
-            <!-- Aktivitas Investasi -->
-            <div class="mb-8">
-                <h2 class="mb-2 text-xl font-semibold">Investing Activities</h2>
-                <table class="min-w-full border border-gray-200 bg-white">
-                    <thead>
-                        <tr class="bg-gray-100">
-                            <th class="border px-4 py-2">Account</th>
-                            <th class="border px-4 py-2">Inflow</th>
-                            <th class="border px-4 py-2">Outflow</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr
-                            v-for="activity in cashFlow.investing"
-                            :key="activity.name"
+            <div>
+                <h2 class="mb-2 text-xl font-semibold">Des</h2>
+                <Table class="text-md border">
+                    <TableHeader class="">
+                        <TableRow
+                            class="text-center font-bold uppercase text-black"
                         >
-                            <td class="border px-4 py-2">
-                                {{ activity.name }}
-                            </td>
-                            <td class="border px-4 py-2 text-right">
-                                {{ formatCurrency(activity.inflow) }}
-                            </td>
-                            <td class="border px-4 py-2 text-right">
-                                {{ formatCurrency(activity.outflow) }}
-                            </td>
-                        </tr>
-                        <tr class="bg-gray-50">
-                            <td class="border px-4 py-2 font-semibold">
-                                Total Investing Activities
-                            </td>
-                            <td
-                                class="border px-4 py-2 text-right font-semibold"
+                            <TableHead class="w-1/4">Deskripsi</TableHead>
+                            <TableHead class="w-1/4 text-right"
+                                >Kas Masuk</TableHead
                             >
-                                {{ formatCurrency(totalInvestingInflow) }}
-                            </td>
-                            <td
-                                class="border px-4 py-2 text-right font-semibold"
+                            <TableHead class="w-1/4 text-right"
+                                >Kas Keluar</TableHead
                             >
-                                {{ formatCurrency(totalInvestingOutflow) }}
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+                            <TableHead class="w-1/4 text-right"
+                                >Net Cash Flow</TableHead
+                            >
+                        </TableRow>
+                    </TableHeader>
 
-            <!-- Aktivitas Pendanaan -->
-            <div class="mb-8">
-                <h2 class="mb-2 text-xl font-semibold">Financing Activities</h2>
-                <table class="min-w-full border border-gray-200 bg-white">
-                    <thead>
-                        <tr class="bg-gray-100">
-                            <th class="border px-4 py-2">Account</th>
-                            <th class="border px-4 py-2">Inflow</th>
-                            <th class="border px-4 py-2">Outflow</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr
-                            v-for="activity in cashFlow.financing"
-                            :key="activity.name"
-                        >
-                            <td class="border px-4 py-2">
-                                {{ activity.name }}
-                            </td>
-                            <td class="border px-4 py-2 text-right">
-                                {{ formatCurrency(activity.inflow) }}
-                            </td>
-                            <td class="border px-4 py-2 text-right">
-                                {{ formatCurrency(activity.outflow) }}
-                            </td>
-                        </tr>
-                        <tr class="bg-gray-50">
-                            <td class="border px-4 py-2 font-semibold">
-                                Total Financing Activities
-                            </td>
-                            <td
-                                class="border px-4 py-2 text-right font-semibold"
+                    <TableBody>
+                        <TableRow>
+                            <TableCell> Operasional </TableCell>
+                            <TableCell class="border text-right">
+                                <span v-if="!onProses">
+                                    {{
+                                        formatCurrency(
+                                            cash_flow.operating.cash_in,
+                                        )
+                                    }}
+                                </span>
+                                <span v-else>
+                                    <Skeleton class="h-5 w-full" />
+                                </span>
+                            </TableCell>
+                            <TableCell class="border text-right">
+                                <span v-if="!onProses">
+                                    {{
+                                        formatCurrency(
+                                            cash_flow.operating.cash_out,
+                                        )
+                                    }}
+                                </span>
+                                <span v-else>
+                                    <Skeleton class="h-5 w-full" />
+                                </span>
+                            </TableCell>
+                            <TableCell class="border text-right">
+                                <span v-if="!onProses">
+                                    {{
+                                        formatCurrency(
+                                            cash_flow.operating.cash_in -
+                                                cash_flow.operating.cash_out,
+                                        )
+                                    }}
+                                </span>
+                                <span v-else>
+                                    <Skeleton class="h-5 w-full" />
+                                </span>
+                            </TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell> Investasi </TableCell>
+                            <TableCell class="border text-right">
+                                <span v-if="!onProses">
+                                    {{
+                                        formatCurrency(
+                                            cash_flow.investing.cash_in,
+                                        )
+                                    }}
+                                </span>
+                                <span v-else>
+                                    <Skeleton class="h-5 w-full" />
+                                </span>
+                            </TableCell>
+                            <TableCell class="border text-right">
+                                <span v-if="!onProses">
+                                    {{
+                                        formatCurrency(
+                                            cash_flow.investing.cash_out,
+                                        )
+                                    }}
+                                </span>
+                                <span v-else>
+                                    <Skeleton class="h-5 w-full" />
+                                </span>
+                            </TableCell>
+                            <TableCell class="border text-right">
+                                <span v-if="!onProses">
+                                    {{
+                                        formatCurrency(
+                                            cash_flow.investing.cash_in -
+                                                cash_flow.investing.cash_out,
+                                        )
+                                    }}
+                                </span>
+                                <span v-else>
+                                    <Skeleton class="h-5 w-full" />
+                                </span>
+                            </TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell> Pendanaan </TableCell>
+                            <TableCell class="border text-right">
+                                <span v-if="!onProses">
+                                    {{
+                                        formatCurrency(
+                                            cash_flow.financing.cash_in,
+                                        )
+                                    }}
+                                </span>
+                                <span v-else>
+                                    <Skeleton class="h-5 w-full" />
+                                </span>
+                            </TableCell>
+                            <TableCell class="border text-right">
+                                <span v-if="!onProses">
+                                    {{
+                                        formatCurrency(
+                                            cash_flow.financing.cash_out,
+                                        )
+                                    }}
+                                </span>
+                                <span v-else>
+                                    <Skeleton class="h-5 w-full" />
+                                </span>
+                            </TableCell>
+                            <TableCell class="border text-right">
+                                <span v-if="!onProses">
+                                    {{
+                                        formatCurrency(
+                                            cash_flow.financing.cash_in -
+                                                cash_flow.financing.cash_out,
+                                        )
+                                    }}
+                                </span>
+                                <span v-else>
+                                    <Skeleton class="h-5 w-full" />
+                                </span>
+                            </TableCell>
+                        </TableRow>
+                    </TableBody>
+                    <TableFooter>
+                        <TableRow class="font-bold">
+                            <TableCell class="text-right" colspan="3"
+                                >Net Cash Flow</TableCell
                             >
-                                {{ formatCurrency(totalFinancingInflow) }}
-                            </td>
-                            <td
-                                class="border px-4 py-2 text-right font-semibold"
-                            >
-                                {{ formatCurrency(totalFinancingOutflow) }}
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Total Arus Kas -->
-            <div class="mt-8">
-                <table class="min-w-full border border-gray-200 bg-white">
-                    <tbody>
-                        <tr class="bg-gray-50">
-                            <td class="border px-4 py-2 font-semibold">
-                                Net Cash Flow
-                            </td>
-                            <td
-                                class="border px-4 py-2 text-right font-semibold"
-                            >
-                                {{ formatCurrency(netCashFlow) }}
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                            <TableCell class="text-right font-bold">
+                                <span v-if="!onProses">
+                                    {{ formatCurrency(netCashFlow) }}
+                                </span>
+                                <span v-else>
+                                    <Skeleton class="h-5 w-full" />
+                                </span>
+                            </TableCell>
+                        </TableRow>
+                    </TableFooter>
+                </Table>
             </div>
         </div>
     </AuthenticatedLayout>
 </template>
-
-<script setup>
-import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue';
-import { ref, computed } from 'vue';
-import { router } from '@inertiajs/vue3';
-
-const props = defineProps({
-    cashFlow: Object,
-    startDate: String,
-    endDate: String,
-});
-
-const startDate = ref(props.startDate);
-const endDate = ref(props.endDate);
-
-const totalOperatingInflow = computed(() => {
-    return props.cashFlow.operating.reduce(
-        (sum, activity) => sum + activity.inflow,
-        0,
-    );
-});
-
-const totalOperatingOutflow = computed(() => {
-    return props.cashFlow.operating.reduce(
-        (sum, activity) => sum + activity.outflow,
-        0,
-    );
-});
-
-const totalInvestingInflow = computed(() => {
-    return props.cashFlow.investing.reduce((sum, activity) => {
-        const inflow = parseFloat(activity.inflow) || 0; // Pastikan inflow adalah angka
-        return sum + inflow;
-    }, 0);
-});
-
-const totalInvestingOutflow = computed(() => {
-    return props.cashFlow.investing.reduce((sum, activity) => {
-        const outflow = parseFloat(activity.outflow) || 0; // Pastikan outflow adalah angka
-        return sum + outflow;
-    }, 0);
-});
-
-const totalFinancingInflow = computed(() => {
-    return props.cashFlow.financing.reduce((sum, activity) => {
-        const inflow = parseFloat(activity.inflow) || 0; // Pastikan inflow adalah angka
-        return sum + inflow;
-    }, 0);
-});
-
-const totalFinancingOutflow = computed(() => {
-    return props.cashFlow.financing.reduce((sum, activity) => {
-        const outflow = parseFloat(activity.outflow) || 0; // Pastikan outflow adalah angka
-        return sum + outflow;
-    }, 0);
-});
-
-const netCashFlow = computed(() => {
-    return (
-        totalOperatingInflow.value -
-        totalOperatingOutflow.value +
-        (totalInvestingInflow.value - totalInvestingOutflow.value) +
-        (totalFinancingInflow.value - totalFinancingOutflow.value)
-    );
-});
-
-const formatCurrency = (value) => {
-    return new Intl.NumberFormat('id-ID', {
-        style: 'currency',
-        currency: 'IDR',
-    }).format(value);
-};
-
-const fetchCashFlow = () => {
-    router.get(
-        route('cash-flow.index'),
-        { start_date: startDate.value, end_date: endDate.value },
-        {
-            preserveState: true,
-        },
-    );
-};
-</script>

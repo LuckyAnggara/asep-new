@@ -52,6 +52,7 @@ const form = useForm({
     name: null,
     sub_category_id: null,
     description: null,
+    cashflow_type: null,
 });
 
 function onSubmit() {
@@ -133,6 +134,32 @@ function onSubmit() {
                                         :value="item.id.toString()"
                                     >
                                         {{ item.code }} - {{ item.name }}
+                                    </SelectItem>
+                                </SelectGroup>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div class="grid gap-2">
+                        <Label for="email">Tipe Cashflow</Label>
+                        <Select v-model="form.cashflow_type">
+                            <SelectTrigger>
+                                <SelectValue
+                                    placeholder="Pilih Sub Tipe Cashflow"
+                                />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectGroup>
+                                    <SelectItem value="null">
+                                        Tidak ada
+                                    </SelectItem>
+                                    <SelectItem value="operating">
+                                        Operating
+                                    </SelectItem>
+                                    <SelectItem value="financing">
+                                        Financing
+                                    </SelectItem>
+                                    <SelectItem value="investing">
+                                        Investing
                                     </SelectItem>
                                 </SelectGroup>
                             </SelectContent>
