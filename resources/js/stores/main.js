@@ -122,10 +122,13 @@ export const useMainStore = defineStore('main', {
                         title: 'Ledger',
                         url: 'ledger.index',
                     },
-
                     {
                         title: 'Income Statement',
                         url: 'income-statement.index',
+                    },
+                    {
+                        title: 'Trial Balance',
+                        url: 'trial-balance',
                     },
                     {
                         title: 'Cash Flow',

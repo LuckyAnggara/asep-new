@@ -7,6 +7,7 @@ use App\Http\Controllers\BalanceSheetController;
 use App\Http\Controllers\CashFlowController;
 use App\Http\Controllers\ChartOfAccountController;
 use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\FinancialStatementController;
 use App\Http\Controllers\IncomeStatementController;
 use App\Http\Controllers\JournalEntryController;
 use App\Http\Controllers\LedgerController;
@@ -60,6 +61,7 @@ Route::resource('accounting/cash-flow', CashFlowController::class)->only(['index
     ->middleware(['auth', 'verified']);
 Route::resource('accounting/income-statement', IncomeStatementController::class)->only(['index'])
     ->middleware(['auth', 'verified']);
+Route::get('accounting/trial-balance', [FinancialStatementController::class, 'trialBalance'])->name('trial-balance');
 
 
 Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');

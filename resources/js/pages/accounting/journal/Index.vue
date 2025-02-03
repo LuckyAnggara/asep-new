@@ -62,12 +62,12 @@
 </template>
 
 <script setup>
-import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue';
-import ReusableTable from '@/components/ReusableTable.vue';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import ReusableTable from '@/Components/ReusableTable.vue';
 import { router, Link } from '@inertiajs/vue3';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import DeleteDialog from '@/components/DeleteDialog.vue';
+import { Button } from '@/Components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs';
+import DeleteDialog from '@/Components/DeleteDialog.vue';
 import { computed, reactive, ref } from 'vue';
 import { useMainStore } from '@/stores/main';
 
@@ -79,7 +79,6 @@ const props = defineProps({
 const journalEntries = computed(() => props.journal_entries);
 const journalEntryDetails = computed(() => props.journal_entry_details);
 
-console.info(props.journal_entry_details);
 const mainStore = useMainStore();
 
 const columnMaster = ref([

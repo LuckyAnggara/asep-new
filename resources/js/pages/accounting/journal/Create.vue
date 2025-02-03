@@ -7,14 +7,38 @@
             class="flex flex-col items-start rounded-lg border border-dashed p-6 shadow-sm lg:flex-row lg:space-x-6"
         >
             <form class="w-full space-y-4 lg:w-1/3">
+                <div class="grid gap-2">
+                    <Label for="email">Jenis Journal</Label>
+                    <Select v-model="form.journal_type">
+                        <SelectTrigger>
+                            <SelectValue placeholder="Pilih Jenis Journal" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectGroup>
+                                <SelectItem value="umum">
+                                    Journal Umum
+                                </SelectItem>
+                                <SelectItem value="ob">
+                                    Begining Balance
+                                </SelectItem>
+                            </SelectGroup>
+                        </SelectContent>
+                    </Select>
+                </div>
+
                 <!-- Reference -->
                 <div class="grid gap-2">
                     <Label for="reference">Referensi</Label>
                     <Input
+                        :disabled="isOb"
                         id="reference"
                         v-model="form.reference"
                         type="text"
-                        placeholder="Masukkan Referensi"
+                        :placeholder="
+                            isOb
+                                ? 'Referensi akan dibuat otomatis'
+                                : 'Masukkan Referensi'
+                        "
                     />
                 </div>
 
@@ -176,11 +200,11 @@
 </template>
 
 <script setup>
-import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import SelectAccount from '@/components/SelectAccount.vue';
-import { Separator } from '@/components/ui/separator';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import { Button } from '@/Components/ui/button';
+import { Textarea } from '@/Components/ui/textarea';
+import SelectAccount from '@/Components/SelectAccount.vue';
+import { Separator } from '@/Components/ui/separator';
 import {
     Select,
     SelectContent,
@@ -189,7 +213,7 @@ import {
     SelectLabel,
     SelectTrigger,
     SelectValue,
-} from '@/components/ui/select';
+} from '@/Components/ui/select';
 
 import {
     Table,
@@ -200,7 +224,7 @@ import {
     TableHeader,
     TableRow,
     TableFooter,
-} from '@/components/ui/table';
+} from '@/Components/ui/table';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -211,17 +235,17 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
     AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+} from '@/Components/ui/alert-dialog';
+import { Input } from '@/Components/ui/input';
+import { Label } from '@/Components/ui/label';
 
-import { computed, reactive, ref } from 'vue';
+import { computed, reactive, ref, watch } from 'vue';
 import { useForm, router, usePage } from '@inertiajs/vue3';
 import { useColorMode } from '@vueuse/core';
-import ReusableTable from '@/components/ReusableTable.vue';
+import ReusableTable from '@/Components/ReusableTable.vue';
 import { Trash2 } from 'lucide-vue-next';
 import { ReloadIcon } from '@radix-icons/vue';
-import { useToast } from '@/components/ui/toast';
+import { useToast } from '@/Components/ui/toast';
 import { formatCurrency } from '@/lib/utils';
 
 const { toast } = useToast();
@@ -230,6 +254,7 @@ const page = usePage();
 const props = defineProps({
     accounts: Array, // Daftar akun dari backend
 });
+const isOb = ref(false);
 const onProses = ref(false);
 const openAlertDialog = ref(false);
 const fileError = ref(false);
@@ -238,6 +263,7 @@ const form = useForm({
     reference: '',
     description: '',
     attachment: '',
+    journal_type: 'umum',
     details: [{ account_id: '', name: '', code: '', debit: 0, credit: 0 }],
 });
 
@@ -281,6 +307,7 @@ const onSubmit = () => {
 
     // Append form values to FormData
     formData.append('reference', form.reference || '');
+    formData.append('journal_type', form.journal_type || '');
     formData.append(
         'date',
         new Date(form.date).toISOString().split('T')[0] || '',
@@ -351,4 +378,16 @@ const handleFileUpload = (event) => {
         form.attachment = selectedFile;
     }
 };
+
+watch(
+    () => form.journal_type,
+    (x) => {
+        if (x == 'ob') {
+            form.reference = '';
+            isOb.value = true;
+        } else if (x == 'umum') {
+            isOb.value = false;
+        }
+    },
+);
 </script>

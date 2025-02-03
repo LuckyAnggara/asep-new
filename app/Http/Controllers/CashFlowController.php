@@ -81,7 +81,7 @@ class CashFlowController extends Controller
 
 
 
-        return Inertia::render('accounting/cashflow/Index', [
+        return Inertia::render('Accounting/FinancialStatements/CashFlow', [
             'cash_flow' => $cashFlowData,
             // 'net_cash_flow' => $netCashFlow,
         ]);

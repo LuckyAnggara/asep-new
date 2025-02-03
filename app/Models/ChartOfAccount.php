@@ -34,4 +34,9 @@ class ChartOfAccount extends Model
     {
         return $this->belongsTo(AccountSubCategory::class, 'sub_category_id');
     }
+
+    public function journalEntryDetail()
+    {
+        return $this->belongsTo(JournalEntryDetail::class, 'chart_of_accounts_id');
+    }
 }

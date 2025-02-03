@@ -55,7 +55,7 @@ class MemberController extends Controller
                     ], 'like', '%' . $search . '%');
             })->paginate($limit);
 
-        return Inertia::render('members/Index', [
+        return Inertia::render('Members/Index', [
             'members' => $members,
         ]);
     }

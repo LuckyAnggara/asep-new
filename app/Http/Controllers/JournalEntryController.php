@@ -79,7 +79,7 @@ class JournalEntryController extends Controller
             })->orderBy('id', 'desc')->paginate(100000);
 
 
-        return Inertia::render('accounting/journal/Index', [
+        return Inertia::render('Accounting/Journal/Index', [
             'journal_entries' => $journalEntries,
             'journal_entry_details' => $journalEntryDetail
         ]);
@@ -87,7 +87,7 @@ class JournalEntryController extends Controller
 
     public function create()
     {
-        return Inertia::render('accounting/journal/Create', [
+        return Inertia::render('Accounting/Journal/Create', [
             'accounts' => ChartOfAccount::all()
         ]);
     }
@@ -106,7 +106,9 @@ class JournalEntryController extends Controller
             'details.*.credit' => 'required|numeric|min:0',
         ]);
 
-
+        if ($request->journal_type == 'ob') {
+            $reference = JournalEntry::generateJournalCode();
+        }
         // Upload file jika ada
         $attachmentPath = null;
         if ($request->hasFile('attachment')) {
@@ -115,7 +117,7 @@ class JournalEntryController extends Controller
 
         // Simpan data Journal Entry
         $journalEntry = JournalEntry::create([
-            'reference' => $request->reference,
+            'reference' => $request->journal_type == 'ob' ? $reference : $request->reference,
             'date' => Carbon::parse($request->date)->toDateString(),
             'description' => $request->description,
             'attachment' => $attachmentPath,
@@ -137,7 +139,7 @@ class JournalEntryController extends Controller
     public function edit($id)
     {
         $journalEntry = JournalEntry::with('details')->where('id', $id)->first();
-        return Inertia::render('accounting/journal/Edit', [
+        return Inertia::render('Accounting/Journal/Edit', [
             'journal_entry' => $journalEntry,
             'accounts' => ChartOfAccount::all()
         ]);

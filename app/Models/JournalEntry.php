@@ -31,4 +31,15 @@ class JournalEntry extends Model
     {
         return $this->details->sum(fn($detail) => $detail->debit);
     }
+
+    public static function generateJournalCode()
+    {
+        $year = date('Y');
+        $latestOB = self::where('reference', 'LIKE', "OB-$year-%")
+            ->orderBy('reference', 'desc')
+            ->first();
+
+        $nextNumber = $latestOB ? (intval(substr($latestOB->reference, -3)) + 1) : 1;
+        return "OB-$year-" . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+    }
 }

@@ -56,7 +56,7 @@ class LedgerController extends Controller
         // // Query dengan join ke journal_entries dan sorting DESC
 
 
-        return Inertia::render('accounting/ledger/Index', [
+        return Inertia::render('Accounting/FinancialStatements/Ledger', [
             'accounts' => $accounts,
             'transactions' => $result, // Tetap dikirim dalam urutan DESC
         ]);

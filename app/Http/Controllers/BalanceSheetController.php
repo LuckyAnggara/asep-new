@@ -19,7 +19,7 @@ class BalanceSheetController extends Controller
             Carbon::parse($date)->toDateString();
         // Ambil data Balance Sheet
         $balanceSheet = $this->getBalanceSheet($date);
-        return Inertia::render('accounting/balancesheet/Index', [
+        return Inertia::render('Accounting/FinancialStatements/BalanceSheet', [
             'balanceSheet' => $balanceSheet,
             'date' => $date,
         ]);

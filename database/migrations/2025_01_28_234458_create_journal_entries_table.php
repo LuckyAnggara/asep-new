@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('journal_entries', function (Blueprint $table) {
             $table->id();
+            $table->boolean(
+                'is_opening_balance'
+            )->default(false);
             $table->date('date'); // Tanggal transaksi
             $table->string('reference')->nullable(); // Tanggal transaksi
             $table->string('description'); // Deskripsi transaksi

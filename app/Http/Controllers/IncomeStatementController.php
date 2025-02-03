@@ -16,7 +16,7 @@ class IncomeStatementController extends Controller
 
         $data = $this->getIncomeDetail($startDate, $endDate);
         // return $this->getIncomeDetail($startDate, $endDate);
-        return Inertia::render('accounting/income/Index', $data);
+        return Inertia::render('Accounting/FinancialStatements/Income', $data);
     }
 
     public function getIncome($startDate = null, $endDate = null)
