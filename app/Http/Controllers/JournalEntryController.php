@@ -106,9 +106,14 @@ class JournalEntryController extends Controller
             'details.*.credit' => 'required|numeric|min:0',
         ]);
 
-        if ($request->journal_type == 'ob') {
-            $reference = JournalEntry::generateJournalCode();
+        if ($request->reference == null || $request->reference == '') {
+            if ($request->journal_type == 'ob') {
+                $reference = JournalEntry::generateJournalCode();
+            } else {
+                $reference = JournalEntry::generateUniqueJournalReference();
+            }
         }
+
         // Upload file jika ada
         $attachmentPath = null;
         if ($request->hasFile('attachment')) {
@@ -117,7 +122,7 @@ class JournalEntryController extends Controller
 
         // Simpan data Journal Entry
         $journalEntry = JournalEntry::create([
-            'reference' => $request->journal_type == 'ob' ? $reference : $request->reference,
+            'reference' => $reference,
             'date' => Carbon::parse($request->date)->toDateString(),
             'description' => $request->description,
             'attachment' => $attachmentPath,

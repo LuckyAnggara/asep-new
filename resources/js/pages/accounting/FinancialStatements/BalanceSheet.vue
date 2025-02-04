@@ -1,30 +1,53 @@
 <template>
     <AuthenticatedLayout>
         <div class="flex items-center">
-            <h1 class="text-lg font-semibold md:text-2xl">Journal Entry</h1>
+            <h1 class="font-semibold md:text-2xl">Balance Sheet</h1>
         </div>
         <div
             class="flex-1 flex-col items-center justify-center rounded-lg border border-dashed p-6 shadow-sm"
         >
             <!-- Filter Tanggal -->
-            <div class="grid w-fit gap-2">
-                <Label for="reference">Data s.d Tanggal</Label>
-                <VueDatePicker
-                    :preview-format="'dd/MMM/yyyy'"
-                    :format="'dd MMMM yyyy'"
-                    auto-apply
-                    v-model="date"
-                    @update:model-value="fetchBalanceSheet"
-                    :enable-time-picker="false"
-                    :dark="mode == 'dark'"
-                ></VueDatePicker>
-            </div>
 
+            <div class="mb-4 flex items-center gap-4">
+                <Label for="reference">Tanggal Data</Label>
+                <div class="flex flex-row items-center space-x-4 text-center">
+                    <VueDatePicker
+                        :preview-format="'dd/MMM/yyyy'"
+                        :format="'dd MMMM yyyy'"
+                        auto-apply
+                        v-model="startDate"
+                        :enable-time-picker="false"
+                        :dark="mode == 'dark'"
+                    ></VueDatePicker>
+                    <span>s.d</span>
+                    <VueDatePicker
+                        :preview-format="'dd/MMM/yyyy'"
+                        :format="'dd MMMM yyyy'"
+                        auto-apply
+                        v-model="endDate"
+                        :enable-time-picker="false"
+                        :dark="mode == 'dark'"
+                    ></VueDatePicker>
+                    <!-- Submit Button -->
+                    <Button
+                        type="button"
+                        @click="fetchData()"
+                        :disabled="onProses"
+                    >
+                        <span v-if="onProses" class="flex">
+                            <ReloadIcon class="mr-2 h-4 w-4 animate-spin" />
+                            Please wait
+                        </span>
+
+                        <span v-else>Submit</span>
+                    </Button>
+                </div>
+            </div>
             <div class="my-4 flex flex-col space-y-4 xl:w-2/3">
                 <!-- Tabel Aset -->
 
                 <div>
-                    <h2 class="mb-2 text-xl font-semibold">Assets</h2>
+                    <h2 class="mb-2 font-semibold">Assets</h2>
                     <Table class="text-md border">
                         <TableHeader class="">
                             <TableRow
@@ -71,7 +94,7 @@
                     </Table>
                 </div>
 
-                <Table class="border bg-gray-500 text-lg dark:bg-gray-700">
+                <Table class="border bg-gray-500 dark:bg-gray-700">
                     <TableFooter>
                         <TableRow class="font-bold">
                             <TableCell class="w-2/3 text-right uppercase"
@@ -91,7 +114,7 @@
                 <!-- Tabel Liabilities -->
 
                 <div>
-                    <h2 class="mb-2 text-xl font-semibold">Liabilities</h2>
+                    <h2 class="mb-2 font-semibold">Liabilities</h2>
                     <Table class="text-md border">
                         <TableHeader class="">
                             <TableRow
@@ -140,7 +163,7 @@
                 <!-- Tabel Equity -->
 
                 <div>
-                    <h2 class="mb-2 text-xl font-semibold">Equity</h2>
+                    <h2 class="mb-2 font-semibold">Equity</h2>
                     <Table class="text-md border">
                         <TableHeader class="">
                             <TableRow
@@ -184,7 +207,7 @@
                         </TableFooter>
                     </Table>
                 </div>
-                <Table class="border bg-gray-500 text-lg dark:bg-gray-700">
+                <Table class="border bg-gray-500 dark:bg-gray-700">
                     <TableFooter>
                         <TableRow class="font-bold">
                             <TableCell class="w-2/3 text-right uppercase"
@@ -227,7 +250,18 @@ import {
     TableRow,
     TableFooter,
 } from '@/components/ui/table';
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 
+import { ReloadIcon } from '@radix-icons/vue';
+import Button from '@/components/ui/button/Button.vue';
 const mode = useColorMode();
 const props = defineProps({
     balanceSheet: Object,
@@ -235,7 +269,13 @@ const props = defineProps({
 });
 
 const onProses = ref(false);
-const date = ref(props.date);
+const today = new Date();
+const startOfYear = new Date(today.getFullYear(), 0, 1); // 1 Januari tahun ini
+
+const startDate = ref(startOfYear);
+const endDate = ref(today);
+
+const tahun = ref(new Date().getFullYear().toString());
 
 const totalAssets = computed(() => {
     return props.balanceSheet.assets.reduce(
@@ -258,10 +298,13 @@ const totalEquity = computed(() => {
     );
 });
 
-const fetchBalanceSheet = () => {
+const fetchData = () => {
     router.get(
         route('balance-sheet.index'),
-        { date: date.value },
+        {
+            start_date: startDate.value,
+            end_date: endDate.value,
+        },
         {
             preserveState: true,
             async: true,

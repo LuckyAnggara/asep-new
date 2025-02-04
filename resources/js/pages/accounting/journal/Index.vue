@@ -40,7 +40,6 @@
                             <ReusableTable
                                 :columns="columnDetail"
                                 :data="journalEntryDetails?.data"
-                                :actions="actions"
                                 :route-link="'journal-entries'"
                                 :showing-limit="false"
                                 :searching="true"
@@ -107,6 +106,12 @@ const columnDetail = ref([
         childKey: 'date',
     },
     {
+        label: 'Referensi',
+        type: 'string',
+        key: 'journal_entry',
+        childKey: 'reference',
+    },
+    {
         label: 'Nama Akun',
         type: 'string',
         key: 'chart_of_accounts',
@@ -122,12 +127,7 @@ const columnDetail = ref([
         type: 'currency',
         key: 'credit',
     },
-    {
-        label: 'Referensi',
-        type: 'string',
-        key: 'journal_entry',
-        childKey: 'reference',
-    },
+
     {
         label: 'Deskripsi',
         type: 'string',

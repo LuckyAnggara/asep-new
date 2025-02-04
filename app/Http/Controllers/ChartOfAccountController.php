@@ -22,23 +22,37 @@ class ChartOfAccountController extends Controller
         $sub_category = $request->query('sub_category', ''); // Default adalah string kosong
         // Pastikan limit adalah angka yang valid dan
 
-        $accounts = ChartOfAccount::with('parent.category')->when($catFilter, function ($query, $catFilter) {
-            if ($catFilter == 'all') {
-                return $query;
-            }
+        // $accounts = ChartOfAccount::with('parent.category')->when($catFilter, function ($query, $catFilter) {
+        //     if ($catFilter == 'all') {
+        //         return $query;
+        //     }
 
-            return $query
-                ->whereHas('parent', function ($q) use ($catFilter) {
-                    $q->where('category_id', $catFilter);
-                });
-        })->when($sub_category, function ($query, $sub_category) {
-            if ($sub_category == 'all') {
-                return $query;
-            }
+        //     return $query
+        //         ->whereHas('parent', function ($q) use ($catFilter) {
+        //             $q->where('category_id', $catFilter);
+        //         });
+        // })->when($sub_category, function ($query, $sub_category) {
+        //     if ($sub_category == 'all') {
+        //         return $query;
+        //     }
 
-            return $query
-                ->where('sub_category_id', $sub_category);
-        })->when($search, function ($query, $search) {
+        //     return $query
+        //         ->where('sub_category_id', $sub_category);
+        // })->when($search, function ($query, $search) {
+        //     return $query
+        //         ->whereAny(
+        //             [
+        //                 'name',
+        //                 'code',
+        //                 'description',
+        //             ],
+        //             'like',
+        //             '%' . $search . '%'
+        //         );
+        // })->paginate($limit);
+
+
+        $accounts = AccountCategory::with('children.category')->when($search, function ($query, $search) {
             return $query
                 ->whereAny(
                     [
@@ -49,12 +63,18 @@ class ChartOfAccountController extends Controller
                     'like',
                     '%' . $search . '%'
                 );
-        })->paginate($limit);
+        })->get();
 
         $category = AccountCategory::all();
         $sub_category = AccountSubCategory::with('category')->get();
 
-        return Inertia::render('chartofaccounts/Index', [
+        // return [
+        //     'accounts' => $accounts,
+        //     'category' => $category,
+        //     'sub_category' => $sub_category,
+        // ];
+
+        return Inertia::render('ChartOfAccounts/Index', [
             'accounts' => $accounts,
             'category' => $category,
             'sub_category' => $sub_category,

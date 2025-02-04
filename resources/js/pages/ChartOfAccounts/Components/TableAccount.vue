@@ -7,15 +7,35 @@
         </div>
         <div class="flex-1 flex-col items-center justify-center">
             <Button class="mb-4" @click="toCreate()">Tambah Data</Button>
-            <ReusableTable
-                :columns="columns"
-                :data="accounts.data"
-                :actions="actions"
-                :route-link="'chart-of-accounts'"
-                :showing-limit="false"
-                :searching="true"
-                :filtering="filtering"
-            />
+            <div class="flex flex-col justify-between space-y-6">
+                <Table>
+                    <TableHeader>
+                        <TableRow class="font-bold uppercase">
+                            <TableHead>No</TableHead>
+                            <TableHead> Sub Kategori </TableHead>
+                            <TableHead> Kode Akun </TableHead>
+                            <TableHead> Nama Akun </TableHead>
+                            <TableHead> Deskripsi </TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        <TableRow>
+                            <TableCell
+                                colspan="5"
+                                class="items-center text-center font-bold"
+                                >Assets
+                            </TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell>xx </TableCell>
+                            <TableCell>xx </TableCell>
+                            <TableCell>
+                                <span>xx </span>
+                            </TableCell>
+                        </TableRow>
+                    </TableBody>
+                </Table>
+            </div>
         </div>
         <Create v-model="isCreateOpen" @close="isCreateOpen = false" />
         <Edit
@@ -40,8 +60,22 @@ import { Button } from '@/components/ui/button';
 import Edit from '@/Pages/ChartOfAccounts/components/EditAccount.vue';
 import Create from '@/Pages/ChartOfAccounts/components/CreateAccount.vue';
 import DeleteDialog from '@/components/DeleteDialog.vue';
-import { reactive, ref } from 'vue';
-
+import { computed, reactive, ref } from 'vue';
+import { formatValue } from '@/lib/utils';
+import {
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger,
+} from '@/components/ui/accordion';
+import {
+    Table,
+    TableBody,
+    TableHeader,
+    TableRow,
+    TableHead,
+    TableCell,
+} from '@/components/ui/table';
 const props = defineProps({
     accounts: {
         type: Object,

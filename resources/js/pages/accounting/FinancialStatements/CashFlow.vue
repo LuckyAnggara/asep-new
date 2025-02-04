@@ -17,10 +17,11 @@ import {
     TableRow,
     TableFooter,
 } from '@/components/ui/table';
+import { ReloadIcon } from '@radix-icons/vue';
 
-const page = usePage();
+const mode = useColorMode();
 const props = defineProps({
-    cash_flow: Array,
+    cash_flow: Object,
 });
 const today = new Date();
 const startOfYear = new Date(today.getFullYear(), 0, 1); // 1 Januari tahun ini
@@ -123,7 +124,7 @@ const fetchData = () => {
                 </div>
             </div>
 
-            <div>
+            <div v-if="cash_flow">
                 <h2 class="mb-2 text-xl font-semibold">Des</h2>
                 <Table class="text-md border">
                     <TableHeader class="">

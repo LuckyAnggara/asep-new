@@ -1,7 +1,7 @@
 <template>
     <AuthenticatedLayout>
         <div class="flex items-center">
-            <h1 class="text-lg font-semibold md:text-2xl">Journal Entry</h1>
+            <h1 class="font-semibold md:text-2xl">Profit / Loss Statement</h1>
         </div>
         <div
             class="flex-1 flex-col items-center justify-center rounded-lg border border-dashed p-6 shadow-sm"
@@ -47,8 +47,8 @@
                 <!-- Tabel Revenue -->
 
                 <div>
-                    <h2 class="mb-2 text-xl font-semibold">Revenue</h2>
-                    <Table class="text-md border">
+                    <h2 class="mb-2 font-semibold">Revenue</h2>
+                    <Table class="border">
                         <TableHeader class="">
                             <TableRow
                                 class="text-center font-bold uppercase text-black"
@@ -98,7 +98,7 @@
 
                 <div>
                     <h2 class="mb-2 text-xl font-semibold">Expenses</h2>
-                    <Table class="text-md border">
+                    <Table class="border">
                         <TableHeader class="">
                             <TableRow
                                 class="text-center font-bold uppercase text-black"
@@ -145,7 +145,7 @@
 
                 <!-- Tabel Profit / Loss -->
 
-                <Table class="border bg-gray-500 text-lg dark:bg-gray-700">
+                <Table class="border bg-gray-500 dark:bg-gray-700">
                     <TableFooter>
                         <TableRow class="font-bold">
                             <TableCell class="w-2/3 text-right uppercase"

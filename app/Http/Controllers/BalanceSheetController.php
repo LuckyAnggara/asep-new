@@ -14,25 +14,10 @@ class BalanceSheetController extends Controller
     public function index(Request $request)
     {
         // Ambil tanggal dari request (jika ada)
-        $date = $request->input('date');
-        $date =
-            Carbon::parse($date)->toDateString();
+        $startDate = $request->input('start_date', Carbon::now()->startOfYear()->format('Y-m-d'));
+        $endDate = $request->input('end_date', Carbon::now()->format('Y-m-d'));
+
         // Ambil data Balance Sheet
-        $balanceSheet = $this->getBalanceSheet($date);
-        return Inertia::render('Accounting/FinancialStatements/BalanceSheet', [
-            'balanceSheet' => $balanceSheet,
-            'date' => $date,
-        ]);
-    }
-
-
-    public function getBalanceSheet($date = null)
-    {
-        // Jika tanggal tidak diberikan, gunakan tanggal hari ini
-        $endDate = $date ? Carbon::parse($date) : Carbon::now();
-        $startDate = Carbon::now()->startOfYear();
-
-        // Ambil semua akun
         $accounts = ChartOfAccount::with(['subCategory.category'])->get();
         $incomeStatementController = new IncomeStatementController();
         $income = $incomeStatementController->getIncome($startDate, $endDate);
@@ -72,19 +57,19 @@ class BalanceSheetController extends Controller
         ];
 
         foreach ($accounts as $account) {
-            $categoryType = $account->subCategory->category->name;
+            $categoryType = $account->account_number;
 
-            if (in_array($categoryType, ['Assets'])) {
+            if (in_array($categoryType, [1])) {
                 $balanceSheet['assets'][] = [
                     'name' => $account->name,
                     'balance' => $balances[$account->id],
                 ];
-            } elseif (in_array($categoryType, ['Liabilities'])) {
+            } elseif (in_array($categoryType, [2])) {
                 $balanceSheet['liabilities'][] = [
                     'name' => $account->name,
                     'balance' => $balances[$account->id],
                 ];
-            } elseif (in_array($categoryType, ['Equity'])) {
+            } elseif (in_array($categoryType, [3])) {
                 $balanceSheet['equity'][] = [
                     'name' => $account->name,
                     'balance' => $balances[$account->id],
@@ -96,6 +81,26 @@ class BalanceSheetController extends Controller
             'name' => 'Profit / Loss',
             'balance' => $income['net_income']
         ];
+
+
+        return Inertia::render('Accounting/FinancialStatements/BalanceSheet', [
+            'balanceSheet' => $balanceSheet,
+
+        ]);
+    }
+
+
+    public function getBalanceSheet($date = null, $tahun = null)
+    {
+        // Jika tanggal tidak diberikan, gunakan tanggal hari ini
+        $endDate = $date ? Carbon::parse($date) : Carbon::now();
+        if ($tahun) { // Jika $tahun diisi (tidak kosong)
+            $startDate = Carbon::createFromDate($tahun, 1, 1); // Buat objek Carbon untuk 1 Januari tahun tersebut
+        } else { // Jika $tahun tidak diisi
+            $startDate = Carbon::now()->startOfYear(); // Gunakan 1 Januari tahun текущий
+        }
+
+
 
         return $balanceSheet;
     }

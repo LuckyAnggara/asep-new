@@ -16,3 +16,48 @@ export const formatCurrency = (value) => {
         currency: company.value.currency,
     }).format(value);
 };
+
+export const formatValue = (value, type) => {
+    // Handle tipe data
+    switch (type) {
+        case 'currency':
+            return value != null
+                ? parseFloat(value).toLocaleString('id-ID', {
+                      style: 'currency',
+                      currency: page.props.auth.company.currency,
+                      minimumFractionDigits: 0,
+                  })
+                : '-';
+
+        case 'number':
+            return value != null
+                ? parseFloat(value).toLocaleString('id-ID')
+                : '-';
+
+        case 'date':
+            return value
+                ? new Date(value).toLocaleDateString('id-ID', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                  })
+                : '-';
+
+        case 'datetime':
+            return value
+                ? new Date(value).toLocaleDateString('id-ID', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                  }) +
+                      ' ' +
+                      new Date(value).toLocaleTimeString('id-ID')
+                : '-';
+
+        case 'boolean':
+            return value ? '✓' : '✗';
+
+        default:
+            return value ?? '-';
+    }
+};

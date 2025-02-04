@@ -6,11 +6,12 @@
             <Tabs default-value="account">
                 <TabsList class="w-[400px]">
                     <TabsTrigger value="account"> Account </TabsTrigger>
-                    <TabsTrigger value="account_category">
-                        Account Category
-                    </TabsTrigger>
+
                     <TabsTrigger value="account_sub_category">
                         Account Sub Category
+                    </TabsTrigger>
+                    <TabsTrigger value="account_category">
+                        Account Category
                     </TabsTrigger>
                 </TabsList>
                 <TabsContent value="account" class="my-4">

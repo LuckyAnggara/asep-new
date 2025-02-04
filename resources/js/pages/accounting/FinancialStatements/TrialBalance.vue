@@ -219,6 +219,8 @@ const fetchData = () => {
                                     <Skeleton class="h-5 w-full" />
                                 </span>
                             </TableCell>
+                            <TableCell class="text-right font-bold">
+                            </TableCell>
                         </TableRow>
                     </TableFooter>
                 </Table>

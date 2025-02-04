@@ -1,14 +1,14 @@
 <script setup>
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@/Components/ui/badge';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/Components/ui/button';
 import {
     Card,
     CardContent,
     CardDescription,
     CardHeader,
     CardTitle,
-} from '@/components/ui/card';
+} from '@/Components/ui/card';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -16,9 +16,9 @@ import {
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+} from '@/Components/ui/dropdown-menu';
+import { Input } from '@/Components/ui/input';
+import { Sheet, SheetContent, SheetTrigger } from '@/Components/ui/sheet';
 import {
     Bell,
     CircleUser,
@@ -32,7 +32,7 @@ import {
     Users,
 } from 'lucide-vue-next';
 
-import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 </script>
 
 <template>

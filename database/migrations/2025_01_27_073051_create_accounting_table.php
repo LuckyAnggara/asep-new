@@ -39,7 +39,7 @@ return new class extends Migration
             $table->foreignId('sub_category_id')->constrained('account_sub_categories')->onDelete('cascade');
             $table->string('code');
             $table->string('name'); // Nama akun spesifik
-            $table->string('account_number')->unique(); // Nomor akun (opsional)
+            $table->string('account_number'); // Nomor akun (opsional)
             $table->enum('cashflow_type', ['operating', 'investing', 'financing'])->nullable();
             $table->string('description')->nullable(); // Deskripsi tambahan
             $table->timestamps();

@@ -25,6 +25,11 @@ class ChartOfAccount extends Model
         );
     }
 
+    public function children()
+    {
+        return $this->hasMany(JournalEntryDetail::class, 'chart_of_accounts_id');
+    }
+
     public function parent()
     {
         return $this->belongsTo(AccountSubCategory::class, 'sub_category_id');

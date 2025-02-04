@@ -370,6 +370,8 @@ const getRowNumber = (index) => {
 };
 
 const updateRoute = (additionalData = {}) => {
+    limit.value = props.showingLimit == true ? '10' : '1000000';
+
     props.filtering.forEach((filter) => {
         filter.key = paramater.value[filter.query];
     });

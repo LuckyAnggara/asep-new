@@ -1,7 +1,7 @@
 <template>
     <AuthenticatedLayout>
         <div class="flex items-center">
-            <h1 class="text-lg font-semibold md:text-2xl">Inventory</h1>
+            <h1 class="text-lg font-semibold md:text-2xl">Anggota</h1>
         </div>
         <div
             class="flex-1 flex-col items-center justify-center rounded-lg border border-dashed p-6 shadow-sm"

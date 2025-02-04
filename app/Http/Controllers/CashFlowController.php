@@ -28,7 +28,12 @@ class CashFlowController extends Controller
             })
             ->get();
 
-        $cashFlowData = [];
+        // Inisialisasi data arus kas
+        $cashFlowData = [
+            'operating' => ['cash_in' => 0, 'cash_out' => 0],
+            'investing' => ['cash_in' => 0, 'cash_out' => 0],
+            'financing' => ['cash_in' => 0, 'cash_out' => 0],
+        ];
 
         // Loop melalui setiap transaksi
         foreach ($cashFlow as $entry) {
@@ -73,11 +78,6 @@ class CashFlowController extends Controller
                     break;
             }
         }
-
-        // Hitung total net cash flow
-        $netCashFlow = [
-            'total' => array_sum(array_column($cashFlowData, 'cash_in')) - array_sum(array_column($cashFlowData, 'cash_out'))
-        ];
 
 
 

@@ -65,7 +65,7 @@ class MemberController extends Controller
      */
     public function create()
     {
-        return Inertia::render('members/Create');
+        return Inertia::render('Members/Create');
     }
 
     /**
