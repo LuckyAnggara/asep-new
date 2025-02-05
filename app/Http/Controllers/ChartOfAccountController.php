@@ -22,37 +22,23 @@ class ChartOfAccountController extends Controller
         $sub_category = $request->query('sub_category', ''); // Default adalah string kosong
         // Pastikan limit adalah angka yang valid dan
 
-        // $accounts = ChartOfAccount::with('parent.category')->when($catFilter, function ($query, $catFilter) {
-        //     if ($catFilter == 'all') {
-        //         return $query;
-        //     }
+        $accounts = ChartOfAccount::with('parent.category')->when($catFilter, function ($query, $catFilter) {
+            if ($catFilter == 'all') {
+                return $query;
+            }
 
-        //     return $query
-        //         ->whereHas('parent', function ($q) use ($catFilter) {
-        //             $q->where('category_id', $catFilter);
-        //         });
-        // })->when($sub_category, function ($query, $sub_category) {
-        //     if ($sub_category == 'all') {
-        //         return $query;
-        //     }
+            return $query
+                ->whereHas('parent', function ($q) use ($catFilter) {
+                    $q->where('category_id', $catFilter);
+                });
+        })->when($sub_category, function ($query, $sub_category) {
+            if ($sub_category == 'all') {
+                return $query;
+            }
 
-        //     return $query
-        //         ->where('sub_category_id', $sub_category);
-        // })->when($search, function ($query, $search) {
-        //     return $query
-        //         ->whereAny(
-        //             [
-        //                 'name',
-        //                 'code',
-        //                 'description',
-        //             ],
-        //             'like',
-        //             '%' . $search . '%'
-        //         );
-        // })->paginate($limit);
-
-
-        $accounts = AccountCategory::with('children.category')->when($search, function ($query, $search) {
+            return $query
+                ->where('sub_category_id', $sub_category);
+        })->when($search, function ($query, $search) {
             return $query
                 ->whereAny(
                     [
@@ -63,10 +49,26 @@ class ChartOfAccountController extends Controller
                     'like',
                     '%' . $search . '%'
                 );
-        })->get();
+        })->orderBy('code', 'asc')->get();
 
-        $category = AccountCategory::all();
-        $sub_category = AccountSubCategory::with('category')->get();
+        // return $accounts;
+
+
+        // $accounts = AccountCategory::with('children.category')->when($search, function ($query, $search) {
+        //     return $query
+        //         ->whereAny(
+        //             [
+        //                 'name',
+        //                 'code',
+        //                 'description',
+        //             ],
+        //             'like',
+        //             '%' . $search . '%'
+        //         );
+        // })->get();
+
+        $category = AccountCategory::orderBy('code', 'asc')->get();
+        $sub_category = AccountSubCategory::with('category')->orderBy('code', 'asc')->get();
 
         // return [
         //     'accounts' => $accounts,
@@ -108,7 +110,7 @@ class ChartOfAccountController extends Controller
 
         // Tentukan kode baru
         $newCode = $lastCode ? intval(explode('-', $lastCode->code)[2]) + 1 : 1;
-        $code = $subCategoryCode->code . '-' . str_pad($newCode, 2, '0', STR_PAD_LEFT);
+        $code = $subCategoryCode->code . '-' . str_pad($newCode, 3, '0', STR_PAD_LEFT);
 
         // Simpan data baru
         ChartOfAccount::create([
@@ -117,7 +119,7 @@ class ChartOfAccountController extends Controller
             'name' => $request->name,
             'account_number' => $subCategoryCode->category->id,
             'description' => $request->description,
-            'cashflow_type' => $request->cashflow_type
+            'cashflow_type' => $request->cashflow_type == "null" ? null : $request->cashflow_type
         ]);
 
         return redirect()->route('chart-of-accounts.index')->with('success', 'Account created successfully.');
@@ -167,7 +169,7 @@ class ChartOfAccountController extends Controller
 
             // Tentukan kode baru
             $newCode = $lastCode ? intval(explode('-', $lastCode->code)[1]) + 1 : 1;
-            $code = $subCategoryCode->code . '-' . str_pad($newCode, 2, '0', STR_PAD_LEFT);
+            $code = $subCategoryCode->code . '-' . str_pad($newCode, 3, '0', STR_PAD_LEFT);
 
             // Perbarui kode
             $account->code = $code;
@@ -177,7 +179,7 @@ class ChartOfAccountController extends Controller
         $account->sub_category_id = $request->sub_category_id;
         $account->name = $request->name;
         $account->description = $request->description;
-        $account->cashflow_type = $request->cashflow_type;
+        $account->cashflow_type = $request->cashflow_type == "null" ? null : $request->cashflow_type;
 
         $account->save();
 

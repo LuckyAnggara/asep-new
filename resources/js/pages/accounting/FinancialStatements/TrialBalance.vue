@@ -43,8 +43,6 @@ const totalCredit = computed(() => {
     );
 });
 
-console.info(props.trialBalance);
-
 const fetchData = () => {
     router.get(
         route('trial-balance'),
@@ -63,6 +61,24 @@ const fetchData = () => {
             },
         },
     );
+};
+
+const toLedger = (i) => {
+    router.visit(route('ledger.index'), {
+        method: 'get',
+        preserveState: true,
+        data: {
+            id: [i],
+            start_date: startDate.value,
+            end_date: endDate.value,
+        },
+        onStart() {
+            onProses.value = true;
+        },
+        onSuccess() {
+            onProses.value = false;
+        },
+    });
 };
 </script>
 
@@ -141,7 +157,11 @@ const fetchData = () => {
                                 </span>
                             </TableCell>
                             <TableCell>
-                                <span v-if="!onProses">
+                                <span
+                                    class="cursor-pointer"
+                                    v-if="!onProses"
+                                    @click="toLedger(account.account_id)"
+                                >
                                     {{ account.account_name }}
                                 </span>
                                 <span v-else>

@@ -13,7 +13,8 @@ class LedgerController extends Controller
     public function index(Request $request)
     {
         $id = $request->input('id', []);
-        $dateRange = $request->input('date', []);
+        $startDate = $request->input('start_date', now()->startOfYear());
+        $endDate = $request->input('end_date', now()->endOfMonth());
 
         $accounts = ChartOfAccount::all();
         $result = [];
@@ -24,15 +25,9 @@ class LedgerController extends Controller
                 ->select('journal_entry_details.*')
                 ->join('journal_entries', 'journal_entry_details.journal_entry_id', '=', 'journal_entries.id')
                 ->where('journal_entry_details.chart_of_accounts_id', $value)
-                ->orderBy('journal_entries.date', 'desc'); // Urutkan dari tanggal terbaru
+                ->orderBy('journal_entries.date', 'desc') // Urutkan dari tanggal terbaru
 
-            // Filter berdasarkan rentang tanggal jika ada input date
-            if (!empty($dateRange) && count($dateRange) === 2) {
-                $startDate = Carbon::parse($dateRange[0])->startOfDay(); // Tanggal awal
-                $endDate = Carbon::parse($dateRange[1])->endOfDay(); // Tanggal akhir
-
-                $query->whereBetween('journal_entries.date', [$startDate, $endDate]);
-            }
+                ->whereBetween('journal_entries.date', [$startDate, $endDate]);
 
             $transactions = $query->get();
             // Hitung balance dengan urutan kronologis (ascending)

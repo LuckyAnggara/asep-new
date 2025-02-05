@@ -21,6 +21,11 @@ class AccountCategory extends Model
         return $this->hasMany(AccountSubCategory::class, 'category_id');
     }
 
+    public function sub_category()
+    {
+        return $this->hasMany(AccountSubCategory::class, 'category_id');
+    }
+
     protected function normal(): Attribute
     {
         return Attribute::make(

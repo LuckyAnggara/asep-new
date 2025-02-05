@@ -62,7 +62,7 @@ Route::resource('accounting/cash-flow', CashFlowController::class)->only(['index
 Route::resource('accounting/income-statement', IncomeStatementController::class)->only(['index'])
     ->middleware(['auth', 'verified']);
 Route::get('accounting/trial-balance', [FinancialStatementController::class, 'trialBalance'])->name('trial-balance');
-
+Route::get('accounting/detailed-balance-sheet', [FinancialStatementController::class, 'detailedBalanceSheet'])->name('detailed-balance-sheet');
 
 Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
 Route::put('/settings/company/{id}', [SettingsController::class, 'updateCompany'])->middleware(['auth', 'verified'])->name('settings.updateCompany');

@@ -24,6 +24,11 @@ class AccountSubCategory extends Model
         return $this->hasMany(ChartOfAccount::class, 'sub_category_id');
     }
 
+    public function coa()
+    {
+        return $this->hasMany(ChartOfAccount::class, 'sub_category_id');
+    }
+
     public function category()
     {
         return $this->belongsTo(AccountCategory::class, 'category_id');

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AccountCategory;
 use App\Models\ChartOfAccount;
 use App\Models\JournalEntryDetail;
 use Carbon\Carbon;
@@ -66,6 +67,36 @@ class FinancialStatementController extends Controller
             'trialBalance' => $trialBalance,
             'startDate' => $startDate,
             'endDate' => $endDate,
+        ]);
+    }
+
+    public function detailedBalanceSheet(Request $request)
+    {
+        $categories = AccountCategory::with('sub_category.coa.children')->get();
+
+        // Menambahkan total saldo ke setiap level
+        $categories->transform(function ($category) {
+            $category->total_balance = $category->sub_category->sum(function ($sub) {
+                return $sub->coa->sum(function ($coa) {
+                    return $coa->children->sum(fn($trx) => $trx->debit - $trx->credit);
+                });
+            });
+
+            $category->sub_category->transform(function ($sub) {
+                $sub->total_balance = $sub->coa->sum(function ($coa) {
+                    return $coa->children->sum(fn($trx) => $trx->debit - $trx->credit);
+                });
+
+                return $sub;
+            });
+
+            return $category;
+        });
+
+        return $categories;
+
+        return Inertia::render('Accounting/FinancialStatements/DetailBalanceSheet', [
+            'accounts' => $categories
         ]);
     }
 }
