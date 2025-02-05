@@ -82,7 +82,6 @@ class BalanceSheetController extends Controller
             'balance' => $income['net_income']
         ];
 
-
         return Inertia::render('Accounting/FinancialStatements/BalanceSheet', [
             'balanceSheet' => $balanceSheet,
 

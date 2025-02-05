@@ -134,12 +134,12 @@ export const useMainStore = defineStore('main', {
                         title: 'Cash Flow',
                         url: 'cash-flow.index',
                     },
-                    // {
-                    //     title: 'Balance Sheet',
-                    //     url: 'balance-sheet.index',
-                    // },
                     {
                         title: 'Balance Sheet',
+                        url: 'balance-sheet.index',
+                    },
+                    {
+                        title: 'Detail Balance Sheet',
                         url: 'detailed-balance-sheet',
                     },
                 ],
