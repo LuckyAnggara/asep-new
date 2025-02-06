@@ -9,40 +9,23 @@
                     </SelectTrigger>
                     <SelectContent>
                         <SelectGroup>
-                            <SelectItem
-                                v-for="(item, index) in limits"
-                                :key="index"
-                                :value="item.value"
-                            >
+                            <SelectItem v-for="(item, index) in limits" :key="index" :value="item.value">
                                 {{ item.label }}
                             </SelectItem>
                         </SelectGroup>
                     </SelectContent>
                 </Select>
             </div>
-            <div
-                class="relative grid w-full items-center gap-1.5"
-                v-if="searching"
-            >
+            <div class="relative grid w-full items-center gap-1.5" v-if="searching">
                 <Label>Search</Label>
                 <div class="relative w-full">
-                    <Search
-                        class="absolute left-2 top-2.5 size-4 text-muted-foreground"
-                    />
+                    <Search class="absolute left-2 top-2.5 size-4 text-muted-foreground" />
                     <Input v-model="search" placeholder="Search" class="pl-8" />
                 </div>
             </div>
-            <div
-                class="w-18 relative grid items-center gap-1.5"
-                v-if="filtering"
-            >
+            <div class="w-18 relative grid items-center gap-1.5" v-if="filtering">
                 <Label>Filter</Label>
-                <Button
-                    type="button"
-                    @click="isSheetFilterOpen = !isSheetFilterOpen"
-                    variant="outline"
-                    size="icon"
-                >
+                <Button type="button" @click="isSheetFilterOpen = !isSheetFilterOpen" variant="outline" size="icon">
                     <ListFilter :stroke-width="1.25" />
                 </Button>
             </div>
@@ -51,36 +34,22 @@
             <template #fallback>
                 <div class="my-6 w-full text-center">Loading data...</div>
             </template>
-            <div
-                class="flex flex-col justify-between space-y-6"
-                :class="tableHeight"
-            >
+            <div class="flex flex-col justify-between space-y-6" :class="tableHeight">
                 <Table>
                     <TableHeader>
                         <TableRow class="font-bold uppercase">
                             <TableHead>No</TableHead>
-                            <TableHead
-                                v-for="column in columns"
-                                :key="column.key"
-                            >
+                            <TableHead v-for="column in columns" :key="column.key">
                                 {{ column.label }}
                             </TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        <TableRow
-                            v-for="(item, index) in data"
-                            :key="index"
-                            v-memo="[item]"
-                        >
+                        <TableRow v-for="(item, index) in data" :key="index" v-memo="[item]">
                             <TableCell>
                                 {{ getRowNumber(index) }}
                             </TableCell>
-                            <TableCell
-                                v-for="column in columns"
-                                :key="column.key"
-                                :class="column.class"
-                            >
+                            <TableCell v-for="column in columns" :key="column.key" :class="column.class">
                                 <span>
                                     {{ formatValue(item, column) }}
                                 </span>
@@ -89,23 +58,15 @@
                             <TableCell v-if="actions">
                                 <DropdownMenu>
                                     <DropdownMenuTrigger as-child>
-                                        <EllipsisVertical
-                                            class="cursor-pointer"
-                                            :size="16"
-                                            :stroke-width="0.5"
-                                        />
+                                        <EllipsisVertical class="cursor-pointer" :size="16" :stroke-width="0.5" />
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent class="w-24">
-                                        <DropdownMenuLabel
-                                            >Actions</DropdownMenuLabel
-                                        >
+                                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                         <DropdownMenuSeparator />
                                         <DropdownMenuGroup>
                                             <DropdownMenuItem
                                                 class="cursor-pointer"
-                                                v-for="(
-                                                    action, actionIndex
-                                                ) in actions"
+                                                v-for="(action, actionIndex) in actions"
                                                 :key="actionIndex"
                                                 @click="action.handler(item)"
                                             >
@@ -170,11 +131,7 @@
                 </SheetHeader>
                 <Separator />
                 <div class="my-6 flex flex-col space-y-6">
-                    <div
-                        class="grid items-center gap-1.5"
-                        v-for="(filter, index) in filtering"
-                        :key="index"
-                    >
+                    <div class="grid items-center gap-1.5" v-for="(filter, index) in filtering" :key="index">
                         <Label>{{ filter.label }}</Label>
                         <VueDatePicker
                             :preview-format="'dd/MMM/yyyy'"
@@ -192,11 +149,7 @@
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectGroup>
-                                    <SelectItem
-                                        v-for="(item, index) in filter.options"
-                                        :key="index"
-                                        :value="item.value"
-                                    >
+                                    <SelectItem v-for="(item, index) in filter.options" :key="index" :value="item.value">
                                         {{ item.label }}
                                     </SelectItem>
                                 </SelectGroup>
@@ -207,19 +160,13 @@
                 <Separator class="mb-3" />
                 <SheetFooter>
                     <SheetClose as-child>
-                        <Button
-                            type="button"
-                            @click="resetData()"
-                            variant="outline"
-                        >
+                        <Button type="button" @click="resetData()" variant="outline">
                             <span v-if="isLoading" class="flex">
                                 <ReloadIcon class="mr-2 h-4 w-4 animate-spin" />
                                 Please wait
                             </span>
 
-                            <span class="flex flex-row" v-else>
-                                <X class="mr-2 h-4 w-4" /> Reset
-                            </span>
+                            <span class="flex flex-row" v-else> <X class="mr-2 h-4 w-4" /> Reset </span>
                         </Button>
                     </SheetClose>
                     <SheetClose as-child>
@@ -229,9 +176,7 @@
                                 Please wait
                             </span>
 
-                            <span class="flex flex-row space-x-4" v-else>
-                                <ListFilter /> <span>Filter</span></span
-                            >
+                            <span class="flex flex-row space-x-4" v-else> <ListFilter /> <span>Filter</span></span>
                         </Button>
                     </SheetClose>
                 </SheetFooter>
@@ -254,24 +199,8 @@
  */
 
 import { computed, ref } from 'vue';
-import {
-    Sheet,
-    SheetContent,
-    SheetDescription,
-    SheetHeader,
-    SheetClose,
-    SheetFooter,
-    SheetTitle,
-    SheetTrigger,
-} from '@/components/ui/sheet';
-import {
-    Table,
-    TableBody,
-    TableHeader,
-    TableRow,
-    TableHead,
-    TableCell,
-} from '@/components/ui/table';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetClose, SheetFooter, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Table, TableBody, TableHeader, TableRow, TableHead, TableCell } from '@/components/ui/table';
 import {
     Pagination,
     PaginationEllipsis,
@@ -291,20 +220,12 @@ import {
     DropdownMenuGroup,
     DropdownMenuItem,
 } from '@/components/ui/dropdown-menu';
-import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectLabel,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-
+import { formatCurrency } from '@/lib/utils';
 import { EllipsisVertical, Search, ListFilter, X } from 'lucide-vue-next';
 import { ReloadIcon } from '@radix-icons/vue';
 import { WhenVisible, router, usePage } from '@inertiajs/vue3';
@@ -424,11 +345,7 @@ watchDebounced(
     (newVal, oldVal) => {
         console.info(newVal);
         // Check if only limit or search property has changed
-        if (
-            Object.keys(newVal).length === Object.keys(oldVal).length &&
-            newVal.limit === oldVal.limit &&
-            newVal.search === oldVal.search
-        ) {
+        if (Object.keys(newVal).length === Object.keys(oldVal).length && newVal.limit === oldVal.limit && newVal.search === oldVal.search) {
             return;
         }
         searchData();
@@ -467,18 +384,10 @@ const formatValue = (item, column) => {
     // Handle tipe data
     switch (column.type) {
         case 'currency':
-            return value != null
-                ? parseFloat(value).toLocaleString('id-ID', {
-                      style: 'currency',
-                      currency: page.props.auth.company.currency,
-                      minimumFractionDigits: 0,
-                  })
-                : '-';
+            return value != null ? formatCurrency(parseFloat(value)) : '-';
 
         case 'number':
-            return value != null
-                ? parseFloat(value).toLocaleString('id-ID')
-                : '-';
+            return value != null ? parseFloat(value).toLocaleString('id-ID') : '-';
 
         case 'date':
             return value

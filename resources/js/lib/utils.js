@@ -14,6 +14,7 @@ export const formatCurrency = (value) => {
     return new Intl.NumberFormat('id-ID', {
         style: 'currency',
         currency: company.value.currency,
+        minimumFractionDigits: company.value.decimal,
     }).format(value);
 };
 
@@ -30,9 +31,7 @@ export const formatValue = (value, type) => {
                 : '-';
 
         case 'number':
-            return value != null
-                ? parseFloat(value).toLocaleString('id-ID')
-                : '-';
+            return value != null ? parseFloat(value).toLocaleString('id-ID') : '-';
 
         case 'date':
             return value

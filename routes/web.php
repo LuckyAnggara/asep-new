@@ -13,6 +13,7 @@ use App\Http\Controllers\JournalEntryController;
 use App\Http\Controllers\LedgerController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SettingsController;
 use App\Models\ChartOfAccount;
 use Illuminate\Foundation\Application;
@@ -67,6 +68,9 @@ Route::get('accounting/detailed-balance-sheet', [FinancialStatementController::c
 Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
 Route::put('/settings/company/{id}', [SettingsController::class, 'updateCompany'])->middleware(['auth', 'verified'])->name('settings.updateCompany');
 Route::put('/settings/preferences/{id}', [SettingsController::class, 'updatePreferences'])->middleware(['auth', 'verified'])->name('settings.updatePreferences');
+Route::put('/settings/account/{id}', [SettingsController::class, 'updateAccount'])->middleware(['auth', 'verified'])->name('settings.updateAccount');
 Route::put('/settings/security/password', [SettingsController::class, 'updatePassword'])->name('user.updatePassword');
+
+Route::get('report/balance-sheet', [ReportController::class, 'index'])->name('trial-balance');
 
 require __DIR__ . '/auth.php';

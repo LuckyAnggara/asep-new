@@ -3,9 +3,7 @@
         <div class="flex items-center">
             <h1 class="font-semibold md:text-2xl">Balance Sheet</h1>
         </div>
-        <div
-            class="flex-1 flex-col items-center justify-center rounded-lg border border-dashed p-6 shadow-sm"
-        >
+        <div class="flex-1 flex-col items-center justify-center rounded-lg border border-dashed p-6 shadow-sm">
             <!-- Filter Tanggal -->
 
             <div class="mb-4 flex items-center gap-4">
@@ -29,11 +27,7 @@
                         :dark="mode == 'dark'"
                     ></VueDatePicker>
                     <!-- Submit Button -->
-                    <Button
-                        type="button"
-                        @click="fetchData()"
-                        :disabled="onProses"
-                    >
+                    <Button type="button" @click="fetchData()" :disabled="onProses">
                         <span v-if="onProses" class="flex">
                             <ReloadIcon class="mr-2 h-4 w-4 animate-spin" />
                             Please wait
@@ -43,186 +37,224 @@
                     </Button>
                 </div>
             </div>
-            <div class="my-4 flex flex-col space-y-4 xl:w-2/3">
+
+            <!-- Alert -->
+            <Alert variant="destructive" v-if="assets.total_balance !== liabilities.total_balance + equity.total_balance">
+                <AlertCircle class="h-4 w-4" />
+                <AlertTitle>Balance Sheet Tidak Seimbang!</AlertTitle>
+                <AlertDescription>
+                    Laporan keuangan menunjukkan ketidakseimbangan. ⚠️ Kemungkinan penyebab: <strong>Akun Retained Earnings belum ditentukan.</strong>
+
+                    <Link :href="route('settings.index')" class="font-bold text-primary underline"> Klik di sini </Link> untuk mengatur akun dan memperbaiki
+                    ketidakseimbangan.
+                </AlertDescription>
+            </Alert>
+            <!-- Alert -->
+            <div class="flex flex-row items-start space-x-5">
                 <!-- Tabel Aset -->
 
-                <div>
-                    <h2 class="mb-2 font-semibold">Assets</h2>
-                    <Table class="text-md border">
+                <div class="my-4 flex w-2/4 flex-col">
+                    <Table class="w-full border">
                         <TableHeader class="">
-                            <TableRow
-                                class="text-center font-bold uppercase text-black"
-                            >
-                                <TableHead class="w-1/3">Nama Akun</TableHead>
-                                <TableHead class="w-1/3 text-right"
-                                    >Saldo</TableHead
-                                >
+                            <TableRow class="text-center font-bold uppercase text-black">
+                                <TableHead class="w-1/3">Assets</TableHead>
                             </TableRow>
                         </TableHeader>
 
-                        <TableBody>
-                            <TableRow
-                                v-for="asset in balanceSheet.assets"
-                                :key="asset.name"
+                        <TableBody class="w-full">
+                            <tr class="w-full border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                                <td class="w-full px-2 align-middle font-bold [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-0.5">
+                                    <div class="flex flex-row justify-between">
+                                        <span>
+                                            {{ assets.name.toUpperCase() }}
+                                        </span>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr
+                                class="border-b font-medium transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
+                                v-for="item in assets.sub_category"
+                                :key="item.id"
                             >
-                                <TableCell> {{ asset.name }}</TableCell>
-                                <TableCell class="border text-right">
-                                    <span v-if="!onProses">
-                                        {{ formatCurrency(asset.balance) }}
-                                    </span>
-                                    <span v-else>
-                                        <Skeleton class="h-5 w-full" />
-                                    </span>
-                                </TableCell>
-                            </TableRow>
+                                <td class="px-2 py-2 pl-5 align-middle font-semibold [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-0.5">
+                                    <div class="flex flex-row justify-between">
+                                        <span>
+                                            {{ item.code }} -
+                                            {{ item.name.toUpperCase() }}
+                                        </span>
+                                        <span>
+                                            {{ formatCurrency(item.total_balance) }}
+                                        </span>
+                                    </div>
+                                    <div v-if="item.coa.length > 0" class="flex w-full flex-row justify-between">
+                                        <blockquote class="mt-1 w-full border-l-2">
+                                            <ul class="my-2 ml-2 w-full list-disc pr-2 [&>li]:mt-2">
+                                                <li v-for="subItem in item.coa" class="flex w-full flex-row justify-between font-light">
+                                                    <span> {{ subItem.code }} - {{ subItem.name }}</span>
+                                                    <span>{{ formatCurrency(subItem.balance) }}</span>
+                                                </li>
+                                            </ul>
+                                        </blockquote>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr class="w-full border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                                <td class="w-full px-2 align-middle font-bold [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-0.5">
+                                    <div class="flex flex-row justify-between">
+                                        <span> TOTAL {{ assets.name.toUpperCase() }} </span>
+                                        <span> {{ formatCurrency(assets.total_balance) }} </span>
+                                    </div>
+                                </td>
+                            </tr>
                         </TableBody>
-                        <TableFooter>
-                            <TableRow class="font-bold">
-                                <TableCell class="text-right"
-                                    >Total Assets</TableCell
-                                >
-                                <TableCell class="text-right font-bold">
-                                    <span v-if="!onProses">
-                                        {{ formatCurrency(totalAssets) }}
-                                    </span>
-                                    <span v-else>
-                                        <Skeleton class="h-5 w-full" />
-                                    </span>
-                                </TableCell>
-                            </TableRow>
-                        </TableFooter>
                     </Table>
                 </div>
 
+                <div class="my-4 flex w-2/4 flex-col space-y-4">
+                    <div>
+                        <Table class="w-full border">
+                            <TableHeader class="">
+                                <TableRow class="text-center font-bold uppercase text-black">
+                                    <TableHead class="w-1/3">Liabilities</TableHead>
+                                </TableRow>
+                            </TableHeader>
+
+                            <TableBody class="w-full">
+                                <tr class="w-full border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                                    <td class="w-full px-2 align-middle font-bold [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-0.5">
+                                        <div class="flex flex-row justify-between">
+                                            <span>
+                                                {{ liabilities.name.toUpperCase() }}
+                                            </span>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <tr
+                                    class="border-b font-medium transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
+                                    v-for="item in liabilities.sub_category"
+                                    :key="item.id"
+                                >
+                                    <td class="px-2 py-2 pl-5 align-middle font-semibold [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-0.5">
+                                        <div class="flex flex-row justify-between">
+                                            <span>
+                                                {{ item.code }} -
+                                                {{ item.name.toUpperCase() }}
+                                            </span>
+                                            <span>
+                                                {{ formatCurrency(item.total_balance) }}
+                                            </span>
+                                        </div>
+                                        <div v-if="item.coa.length > 0" class="flex w-full flex-row justify-between">
+                                            <blockquote class="mt-1 w-full border-l-2">
+                                                <ul class="my-2 ml-2 w-full list-disc pr-2 [&>li]:mt-2">
+                                                    <li v-for="subItem in item.coa" class="flex w-full flex-row justify-between font-light">
+                                                        <span> {{ subItem.code }} - {{ subItem.name }}</span>
+                                                        <span>{{ formatCurrency(subItem.balance) }}</span>
+                                                    </li>
+                                                </ul>
+                                            </blockquote>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <tr class="w-full border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                                    <td class="w-full px-2 align-middle font-bold [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-0.5">
+                                        <div class="flex flex-row justify-between">
+                                            <span> TOTAL {{ liabilities.name.toUpperCase() }} </span>
+                                            <span> {{ formatCurrency(liabilities.total_balance) }} </span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </TableBody>
+                        </Table>
+                    </div>
+                    <div>
+                        <Table class="w-full border">
+                            <TableHeader class="">
+                                <TableRow class="text-center font-bold uppercase text-black">
+                                    <TableHead class="w-1/3">Equity</TableHead>
+                                </TableRow>
+                            </TableHeader>
+
+                            <TableBody class="w-full">
+                                <tr class="w-full border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                                    <td class="w-full px-2 align-middle font-bold [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-0.5">
+                                        <div class="flex flex-row justify-between">
+                                            <span>
+                                                {{ equity.name.toUpperCase() }}
+                                            </span>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <tr
+                                    class="border-b font-medium transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
+                                    v-for="item in equity.sub_category"
+                                    :key="item.id"
+                                >
+                                    <td class="px-2 py-2 pl-5 align-middle font-semibold [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-0.5">
+                                        <div class="flex flex-row justify-between">
+                                            <span>
+                                                {{ item.code }} -
+                                                {{ item.name.toUpperCase() }}
+                                            </span>
+                                            <span>
+                                                {{ formatCurrency(item.total_balance) }}
+                                            </span>
+                                        </div>
+                                        <div v-if="item.coa.length > 0" class="flex w-full flex-row justify-between">
+                                            <blockquote class="mt-1 w-full border-l-2">
+                                                <ul class="my-2 ml-2 w-full list-disc pr-2 [&>li]:mt-2">
+                                                    <li v-for="subItem in item.coa" class="flex w-full flex-row justify-between font-light">
+                                                        <span> {{ subItem.code }} - {{ subItem.name }}</span>
+                                                        <span>{{ formatCurrency(subItem.balance) }}</span>
+                                                    </li>
+                                                </ul>
+                                            </blockquote>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <tr class="w-full border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                                    <td class="w-full px-2 align-middle font-bold [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-0.5">
+                                        <div class="flex flex-row justify-between">
+                                            <span> TOTAL {{ equity.name.toUpperCase() }} </span>
+                                            <span> {{ formatCurrency(equity.total_balance) }} </span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </TableBody>
+                        </Table>
+                    </div>
+                </div>
+            </div>
+            <div class="flex flex-row items-start space-x-5">
                 <Table class="border bg-gray-500 dark:bg-gray-700">
                     <TableFooter>
                         <TableRow class="font-bold">
-                            <TableCell class="w-2/3 text-right uppercase"
-                                >Total Assets</TableCell
-                            >
+                            <TableCell class="w-2/3 text-right uppercase">TOTAL ASSETS</TableCell>
                             <TableCell class="text-right font-bold">
                                 <span v-if="!onProses">
-                                    {{ formatCurrency(totalAssets) }}
+                                    {{ formatCurrency(assets.total_balance) }}
                                 </span>
-                                <span v-else>
-                                    <Skeleton class="h-5 w-full" /> </span
+                                <span v-else> <Skeleton class="h-5 w-full" /> </span
                             ></TableCell>
                         </TableRow>
                     </TableFooter>
                 </Table>
 
-                <!-- Tabel Liabilities -->
-
-                <div>
-                    <h2 class="mb-2 font-semibold">Liabilities</h2>
-                    <Table class="text-md border">
-                        <TableHeader class="">
-                            <TableRow
-                                class="text-center font-bold uppercase text-black"
-                            >
-                                <TableHead class="w-1/3">Nama Akun</TableHead>
-                                <TableHead class="w-1/3 text-right"
-                                    >Saldo</TableHead
-                                >
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            <TableRow
-                                v-for="asset in balanceSheet.liabilities"
-                                :key="asset.name"
-                            >
-                                <TableCell> {{ asset.name }}</TableCell>
-                                <TableCell class="border text-right">
-                                    <span v-if="!onProses">
-                                        {{ formatCurrency(asset.balance) }}
-                                    </span>
-                                    <span v-else>
-                                        <Skeleton class="h-5 w-full" />
-                                    </span>
-                                </TableCell>
-                            </TableRow>
-                        </TableBody>
-                        <TableFooter>
-                            <TableRow class="font-bold">
-                                <TableCell class="text-right"
-                                    >Total Liabilities</TableCell
-                                >
-                                <TableCell class="text-right font-bold">
-                                    <span v-if="!onProses">
-                                        {{ formatCurrency(totalLiabilities) }}
-                                    </span>
-                                    <span v-else>
-                                        <Skeleton class="h-5 w-full" />
-                                    </span>
-                                </TableCell>
-                            </TableRow>
-                        </TableFooter>
-                    </Table>
-                </div>
-
-                <!-- Tabel Equity -->
-
-                <div>
-                    <h2 class="mb-2 font-semibold">Equity</h2>
-                    <Table class="text-md border">
-                        <TableHeader class="">
-                            <TableRow
-                                class="text-center font-bold uppercase text-black"
-                            >
-                                <TableHead class="w-1/3">Nama Akun</TableHead>
-                                <TableHead class="w-1/3 text-right"
-                                    >Saldo</TableHead
-                                >
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            <TableRow
-                                v-for="asset in balanceSheet.equity"
-                                :key="asset.name"
-                            >
-                                <TableCell> {{ asset.name }}</TableCell>
-                                <TableCell class="border text-right">
-                                    <span v-if="!onProses">
-                                        {{ formatCurrency(asset.balance) }}
-                                    </span>
-                                    <span v-else>
-                                        <Skeleton class="h-5 w-full" />
-                                    </span>
-                                </TableCell>
-                            </TableRow>
-                        </TableBody>
-                        <TableFooter>
-                            <TableRow class="font-bold">
-                                <TableCell class="text-right"
-                                    >Total Equity</TableCell
-                                >
-                                <TableCell class="text-right font-bold">
-                                    <span v-if="!onProses">
-                                        {{ formatCurrency(totalEquity) }}
-                                    </span>
-                                    <span v-else>
-                                        <Skeleton class="h-5 w-full" /> </span
-                                ></TableCell>
-                            </TableRow>
-                        </TableFooter>
-                    </Table>
-                </div>
                 <Table class="border bg-gray-500 dark:bg-gray-700">
                     <TableFooter>
                         <TableRow class="font-bold">
-                            <TableCell class="w-2/3 text-right uppercase"
-                                >Total Liabilities and Equity</TableCell
-                            >
+                            <TableCell class="w-2/3 text-right uppercase">TOTAL LIABILITEIS + EQUITY</TableCell>
                             <TableCell class="text-right font-bold">
                                 <span v-if="!onProses">
-                                    {{
-                                        formatCurrency(
-                                            totalLiabilities + totalEquity,
-                                        )
-                                    }}
+                                    {{ formatCurrency(liabilities.total_balance + equity.total_balance) }}
                                 </span>
-                                <span v-else>
-                                    <Skeleton class="h-5 w-full" /> </span
+                                <span v-else> <Skeleton class="h-5 w-full" /> </span
                             ></TableCell>
                         </TableRow>
                     </TableFooter>
@@ -234,39 +266,49 @@
 
 <script setup>
 import { ref, computed } from 'vue';
-import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { useColorMode } from '@vueuse/core';
 import { router, Link } from '@inertiajs/vue3';
-import Label from '@/components/ui/label/Label.vue';
+import Label from '@/Components/ui/label/Label.vue';
 import { formatCurrency } from '@/lib/utils';
-import { Skeleton } from '@/components/ui/skeleton';
-import {
-    Table,
-    TableBody,
-    TableCaption,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-    TableFooter,
-} from '@/components/ui/table';
-import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectLabel,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
-
+import { Skeleton } from '@/Components/ui/skeleton';
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow, TableFooter } from '@/Components/ui/table';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/Components/ui/select';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { AlertCircle } from 'lucide-vue-next';
 import { ReloadIcon } from '@radix-icons/vue';
-import Button from '@/components/ui/button/Button.vue';
+import Button from '@/Components/ui/button/Button.vue';
 const mode = useColorMode();
 const props = defineProps({
-    balanceSheet: Object,
+    accounts: Object,
     date: String,
 });
+
+const assets = computed(() => {
+    return props.accounts[0];
+});
+
+const liabilities = computed(() => {
+    return props.accounts[1];
+});
+
+const equity = computed(() => {
+    return props.accounts[2];
+});
+
+const revenue = computed(() => {
+    return props.accounts[3];
+});
+
+const expense = computed(() => {
+    return props.accounts[4];
+});
+
+const sortedCoa = (coaList) => {
+    return computed(() => {
+        return [...coaList].sort((a, b) => a.code.localeCompare(b.code));
+    });
+};
 
 const onProses = ref(false);
 const today = new Date();
@@ -275,32 +317,9 @@ const startOfYear = new Date(today.getFullYear(), 0, 1); // 1 Januari tahun ini
 const startDate = ref(startOfYear);
 const endDate = ref(today);
 
-const tahun = ref(new Date().getFullYear().toString());
-
-const totalAssets = computed(() => {
-    return props.balanceSheet.assets.reduce(
-        (sum, asset) => sum + asset.balance,
-        0,
-    );
-});
-
-const totalLiabilities = computed(() => {
-    return props.balanceSheet.liabilities.reduce(
-        (sum, liability) => sum + liability.balance,
-        0,
-    );
-});
-
-const totalEquity = computed(() => {
-    return props.balanceSheet.equity.reduce(
-        (sum, equity) => sum + equity.balance,
-        0,
-    );
-});
-
 const fetchData = () => {
     router.get(
-        route('balance-sheet.index'),
+        route('balance-sheet'),
         {
             start_date: startDate.value,
             end_date: endDate.value,

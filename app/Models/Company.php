@@ -19,7 +19,13 @@ class Company extends Model
         'website',
         'registration_number',
         'currency',
+        'decimal',
         'timezone',
-        'theme'
+        'theme',
+        'retained_earning_id'
+    ];
+
+    protected $casts = [
+        'retained_earning_id' => 'string'
     ];
 }

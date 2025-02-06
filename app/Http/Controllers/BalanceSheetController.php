@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AccountCategory;
 use App\Models\ChartOfAccount;
+use App\Models\Company;
 use App\Models\JournalEntryDetail;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -13,94 +15,93 @@ class BalanceSheetController extends Controller
 
     public function index(Request $request)
     {
-        // Ambil tanggal dari request (jika ada)
+
+        // Ambil tanggal dari request
         $startDate = $request->input('start_date', Carbon::now()->startOfYear()->format('Y-m-d'));
         $endDate = $request->input('end_date', Carbon::now()->format('Y-m-d'));
 
-        // Ambil data Balance Sheet
-        $accounts = ChartOfAccount::with(['subCategory.category'])->get();
+        // Ambil data kategori dengan transaksi
+        $categories = AccountCategory::with([
+            'sub_category' => function ($query) {
+                $query->orderBy('code');
+            },
+            'sub_category.coa' => function ($query) {
+                $query->orderBy('code');
+            },
+            'sub_category.coa.children' => function ($query) {
+                $query->orderBy('created_at');
+            }
+        ])->get();
+
+        // Ambil Net Revenue dari fungsi getIncomeDetail
         $incomeStatementController = new IncomeStatementController();
-        $income = $incomeStatementController->getIncome($startDate, $endDate);
-        // Hitung saldo setiap akun
-        $balances = [];
-        foreach ($accounts as $account) {
-            $debit = JournalEntryDetail::where('chart_of_accounts_id', $account->id)
-                ->whereHas('journalEntry', function ($query) use ($endDate) {
-                    $query->where('date', '<=', $endDate);
-                })
-                ->sum('debit');
+        $netIncome = $incomeStatementController->getIncome($startDate, $endDate);
 
-            $credit = JournalEntryDetail::where('chart_of_accounts_id', $account->id)
-                ->whereHas('journalEntry', function ($query) use ($endDate) {
-                    $query->where('date', '<=', $endDate);
-                })
-                ->sum('credit');
+        // Ambil ID Retained Earnings dari perusahaan
+        $company = Company::select('retained_earning_id')->first();
+        $retainedEarningsId = $company->retained_earning_id ?? null;
 
-            // Hitung saldo berdasarkan jenis akun
-            $categoryType = $account->subCategory->category->normal;
+        // Menambahkan total saldo ke setiap level
+        $categories->transform(function ($category) {
+            $category->total_balance = $category->sub_category->sum(function ($sub) use ($category) {
+                return $sub->coa->sum(fn($coa) => $this->calculateBalance($coa, $category->normal));
+            });
 
-            // if (in_array($categoryType, ['debit'])) {
-            if ($categoryType == 'Debit') {
-                // Aset: Debit - Credit (saldo normal di debit)
-                $balances[$account->id] = $debit - $credit;
-            } else {
-                // Liabilitas dan Ekuitas: Credit - Debit (saldo normal di kredit)
-                $balances[$account->id] = $credit - $debit;
+            $category->sub_category->transform(function ($sub) use ($category) {
+                $sub->total_balance = $sub->coa->sum(fn($coa) => $this->calculateBalance($coa, $category->normal));
+
+                $sub->coa->transform(function ($coa) use ($category) {
+                    $coa->balance = $this->calculateBalance($coa, $category->normal);
+                    return $coa;
+                });
+
+                return $sub;
+            });
+
+            return $category;
+        });
+
+        // Tambahkan Net Income ke akun Retained Earnings
+        $retainedEarningsAccount = null;
+        foreach ($categories as $category) {
+            foreach ($category->sub_category as $sub) {
+                foreach ($sub->coa as $coa) {
+                    if ($coa->id == $retainedEarningsId) {
+                        $retainedEarningsAccount = $coa;
+                        break 3;
+                    }
+                }
             }
         }
 
-        // Kelompokkan akun berdasarkan kategori
-        $balanceSheet = [
-            'assets' => [],
-            'liabilities' => [],
-            'equity' => [],
-        ];
+        if ($retainedEarningsAccount) {
+            $retainedEarningsAccount->balance += $netIncome['net_income'];
+        }
 
-        foreach ($accounts as $account) {
-            $categoryType = $account->account_number;
+        // Temukan kategori Ekuitas (Equity)
+        $equityCategory = $categories->firstWhere('code', '3');
 
-            if (in_array($categoryType, [1])) {
-                $balanceSheet['assets'][] = [
-                    'name' => $account->name,
-                    'balance' => $balances[$account->id],
-                ];
-            } elseif (in_array($categoryType, [2])) {
-                $balanceSheet['liabilities'][] = [
-                    'name' => $account->name,
-                    'balance' => $balances[$account->id],
-                ];
-            } elseif (in_array($categoryType, [3])) {
-                $balanceSheet['equity'][] = [
-                    'name' => $account->name,
-                    'balance' => $balances[$account->id],
-                ];
+        // Jika ditemukan, tambahkan Retained Earnings ke total Ekuitas
+        if ($equityCategory && $retainedEarningsAccount) {
+            if ($retainedEarningsId !== null) {
+                $equityCategory->total_balance += $retainedEarningsAccount->balance;
             }
         }
 
-        $balanceSheet['equity'][] = [
-            'name' => 'Profit / Loss',
-            'balance' => $income['net_income']
-        ];
-
+        // Return ke Vue
         return Inertia::render('Accounting/FinancialStatements/BalanceSheet', [
-            'balanceSheet' => $balanceSheet,
-
+            'accounts' => $categories
         ]);
     }
 
-
-    public function getBalanceSheet($date = null, $tahun = null)
+    /**
+     * Menghitung saldo berdasarkan normal akun (debit atau credit)
+     */
+    private function calculateBalance($coa, $normal)
     {
-        // Jika tanggal tidak diberikan, gunakan tanggal hari ini
-        $endDate = $date ? Carbon::parse($date) : Carbon::now();
-        if ($tahun) { // Jika $tahun diisi (tidak kosong)
-            $startDate = Carbon::createFromDate($tahun, 1, 1); // Buat objek Carbon untuk 1 Januari tahun tersebut
-        } else { // Jika $tahun tidak diisi
-            $startDate = Carbon::now()->startOfYear(); // Gunakan 1 Januari tahun текущий
-        }
+        $balance = $coa->children->sum(fn($trx) => $trx->debit - $trx->credit);
 
-
-
-        return $balanceSheet;
+        // Jika kategori akun memiliki saldo normal "credit", buat saldo tetap positif
+        return $normal === 'Credit' ? -$balance : $balance;
     }
 }

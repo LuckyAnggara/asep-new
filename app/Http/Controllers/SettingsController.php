@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ChartOfAccount;
 use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -11,8 +12,11 @@ class SettingsController extends Controller
 {
     public function index()
     {
+        $coa = ChartOfAccount::orderBy('code', 'asc')->get();
+
         return inertia('Settings/Index', [
             'company' => Company::first(),
+            'coa' => $coa
         ]);
     }
 
@@ -52,14 +56,16 @@ class SettingsController extends Controller
         $request->validate([
             'currency' => 'required|string|max:10',
             'timezone' => 'required|string|max:50',
+            'decimal' => 'required|integer|max:10',
             // 'theme' => 'required|string|in:light,dark,auto',
         ]);
 
         $company = Company::findOrFail($id);
-        $company->update($request->only(['currency', 'timezone']));
+        $company->update($request->only(['currency', 'timezone', 'decimal']));
 
         return redirect()->back()->with('success', 'Preferences updated.');
     }
+
 
     public function updatePassword(Request $request)
     {
@@ -76,5 +82,17 @@ class SettingsController extends Controller
 
 
         return back()->with('success', 'Password updated successfully.');
+    }
+
+    public function updateAccount(Request $request, $id)
+    {
+        $request->validate([
+            'retained_earning_id' => 'nullable|exists:chart_of_accounts,id',
+        ]);
+
+        $company = Company::findOrFail($id);
+        $company->update($request->only(['retained_earning_id']));
+
+        return redirect()->back()->with('success', 'Account updated.');
     }
 }
