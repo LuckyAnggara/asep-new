@@ -7,74 +7,92 @@
 
 <body>
 
-    <div class="px-2 py-8 max-w-xl mx-auto">
-        <div class="flex items-center justify-between mb-8">
-            <div class="flex items-center">
-                <div class="text-gray-700 font-semibold text-lg">Your Company Name</div>
-            </div>
-            <div class="text-gray-700">
-                <div class="font-bold text-xl mb-2 uppercase">Invoice</div>
-                <div class="text-sm">Date: 01/05/2023</div>
-                <div class="text-sm">Invoice #: </div>
-            </div>
+    <!-- Tabel Balance Sheet -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Assets -->
+        <div class="bg-gray-100 p-4 rounded-lg">
+            <h2 class="text-xl font-semibold mb-2">Assets</h2>
+            <table class="w-full border-collapse border border-gray-300">
+                <thead>
+                    <tr class="bg-gray-200">
+                        <th class="border px-4 py-2">Akun</th>
+                        <th class="border px-4 py-2">Saldo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($assets['sub_category'] as $item)
+                    <tr>
+                        <td class="border px-4 py-2">{{ $item['name'] }}</td>
+                        <td class="border px-4 py-2 text-right">{{ number_format($item['balance'], 2) }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+            <p class="font-semibold text-right mt-2">Total Assets: {{ number_format($assets['total_balance'], 2) }}</p>
         </div>
-        <div class="border-b-2 border-gray-300 pb-8 mb-8">
-            <h2 class="text-2xl font-bold mb-4">Bill To:</h2>
-            <div class="text-gray-700 mb-2"></div>
-            <div class="text-gray-700 mb-2">123 Main St.</div>
-            <div class="text-gray-700 mb-2">Anytown, USA 12345</div>
-            <div class="text-gray-700">johndoe@example.com</div>
-        </div>
-        <table class="w-full text-left mb-8">
-            <thead>
-                <tr>
-                    <th class="text-gray-700 font-bold uppercase py-2">Description</th>
-                    <th class="text-gray-700 font-bold uppercase py-2">Quantity</th>
-                    <th class="text-gray-700 font-bold uppercase py-2">Price</th>
-                    <th class="text-gray-700 font-bold uppercase py-2">Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="py-4 text-gray-700">Product 1</td>
-                    <td class="py-4 text-gray-700">1</td>
-                    <td class="py-4 text-gray-700">$100.00</td>
-                    <td class="py-4 text-gray-700">$100.00</td>
-                </tr>
-                <tr>
-                    <td class="py-4 text-gray-700">Product 2</td>
-                    <td class="py-4 text-gray-700">2</td>
-                    <td class="py-4 text-gray-700">$50.00</td>
-                    <td class="py-4 text-gray-700">$100.00</td>
-                </tr>
-                <tr>
-                    <td class="py-4 text-gray-700">Product 3</td>
-                    <td class="py-4 text-gray-700">3</td>
-                    <td class="py-4 text-gray-700">$75.00</td>
-                    <td class="py-4 text-gray-700">$225.00</td>
-                </tr>
-            </tbody>
-        </table>
-        <div class="flex justify-end mb-8">
-            <div class="text-gray-700 mr-2">Subtotal:</div>
-            <div class="text-gray-700">$425.00</div>
-        </div>
-        <div class="text-right mb-8">
-            <div class="text-gray-700 mr-2">Tax:</div>
-            <div class="text-gray-700">$25.50</div>
 
-        </div>
-        <div class="flex justify-end mb-8">
-            <div class="text-gray-700 mr-2">Total:</div>
-            <div class="text-gray-700 font-bold text-xl">$450.50</div>
-        </div>
-        <div class="border-t-2 border-gray-300 pt-8 mb-8">
-            <div class="text-gray-700 mb-2">Payment is due within 30 days. Late payments are subject to fees.</div>
-            <div class="text-gray-700 mb-2">Please make checks payable to Your Company Name and mail to:</div>
-            <div class="text-gray-700">123 Main St., Anytown, USA 12345</div>
+        <!-- Liabilities & Equity -->
+        <div class="space-y-4">
+            <div class="bg-gray-100 p-4 rounded-lg">
+                <h2 class="text-xl font-semibold mb-2">Liabilities</h2>
+                <table class="w-full border-collapse border border-gray-300">
+                    <thead>
+                        <tr class="bg-gray-200">
+                            <th class="border px-4 py-2">Akun</th>
+                            <th class="border px-4 py-2">Saldo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($liabilities['sub_category'] as $item)
+                        <tr>
+                            <td class="border px-4 py-2">{{ $item['name'] }}</td>
+                            <td class="border px-4 py-2 text-right">{{ number_format($item['balance'], 2) }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+                <p class="font-semibold text-right mt-2">Total Liabilities: {{ number_format($liabilities['total_balance'], 2) }}</p>
+            </div>
+
+            <div class="bg-gray-100 p-4 rounded-lg">
+                <h2 class="text-xl font-semibold mb-2">Equity</h2>
+                <table class="w-full border-collapse border border-gray-300">
+                    <thead>
+                        <tr class="bg-gray-200">
+                            <th class="border px-4 py-2">Akun</th>
+                            <th class="border px-4 py-2">Saldo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($equity['sub_category'] as $item)
+                        <tr>
+                            <td class="border px-4 py-2">{{ $item['name'] }}</td>
+                            <td class="border px-4 py-2 text-right">{{ number_format($item['balance'], 2) }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+                <p class="font-semibold text-right mt-2">Total Equity: {{ number_format($equity['total_balance'], 2) }}</p>
+            </div>
         </div>
     </div>
 
+    <!-- Summary -->
+    <div class="mt-6 bg-blue-100 p-4 rounded-lg">
+        <h2 class="text-lg font-semibold text-center">Total Summary</h2>
+        <div class="flex justify-between">
+            <p class="font-bold">Total Assets:</p>
+            <p>{{ number_format($assets['total_balance'], 2) }}</p>
+        </div>
+        <div class="flex justify-between">
+            <p class="font-bold">Total Liabilities + Equity:</p>
+            <p>{{ number_format($liabilities['total_balance'] + $equity['total_balance'], 2) }}</p>
+        </div>
+    </div>
 </body>
 
 </html>
+
+
+
+
