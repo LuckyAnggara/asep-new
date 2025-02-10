@@ -5,15 +5,17 @@ namespace App\Http\Controllers;
 use App\Models\AccountCategory;
 use App\Models\ChartOfAccount;
 use App\Models\Company;
+use App\Models\JournalEntryDetail;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\View;
 use Spatie\LaravelPdf\Facades\Pdf;
 
 use function Spatie\LaravelPdf\Support\pdf;
 
 class ReportController extends Controller
 {
-    public function index(Request $request)
+    public function balancesheet(Request $request)
     {
 
         // Ambil tanggal dari request
@@ -88,11 +90,23 @@ class ReportController extends Controller
             }
         }
 
-        return pdf('report', [
+        // return View('report.financial.balancesheet', [
+        //     'start_date' => Carbon::parse($startDate)->format('d M Y'),
+        //     'end_date' => Carbon::parse($endDate)->format('d M Y'),
+        //     'company' => Company::first(),
+        //     'assets' => $categories[0],
+        //     'liabilities' => $categories[1],
+        //     'equity' => $categories[2],
+        // ]);
+
+        return pdf('report.financial.balancesheet', [
+            'start_date' => Carbon::parse($startDate)->format('d M Y'),
+            'end_date' => Carbon::parse($endDate)->format('d M Y'),
+            'company' => Company::first(),
             'assets' => $categories[0],
             'liabilities' => $categories[1],
             'equity' => $categories[2],
-        ])->download('invoice-for-april-2022.pdf');
+        ])->download('report.pdf');
         // return pdf('report', [
         //     'invoiceNumber' => '1234',
         //     'customerName' => 'Grumpy Cat',
@@ -105,5 +119,91 @@ class ReportController extends Controller
 
         // Jika kategori akun memiliki saldo normal "credit", buat saldo tetap positif
         return $normal === 'Credit' ? -$balance : $balance;
+    }
+
+    public function incomestatement(Request $request)
+    {
+        $startDate = $request->input('start_date', now()->startOfYear());
+        $endDate = $request->input('end_date', now()->endOfMonth());
+
+        $accounts = ChartOfAccount::whereIn('account_number', ['4', '5'])->get();
+
+        // Hitung saldo setiap akun
+        $balances = [];
+        $totalProfit = 0;
+        foreach ($accounts as $account) {
+            $debit = JournalEntryDetail::where('chart_of_accounts_id', $account->id)
+                ->whereHas('journalEntry', function ($query) use ($startDate, $endDate) {
+                    $query->whereBetween('date', [$startDate, $endDate]);
+                })
+                ->sum('debit');
+
+            $credit = JournalEntryDetail::where('chart_of_accounts_id', $account->id)
+                ->whereHas('journalEntry', function ($query) use ($startDate, $endDate) {
+                    $query->whereBetween('date', [$startDate, $endDate]);
+                })
+                ->sum('credit');
+
+            // Hitung saldo berdasarkan jenis akun
+            $categoryType = $account->account_number;
+
+            // if (in_array($categoryType, ['debit'])) {
+            if ($categoryType == 5) {
+                // Aset: Debit - Credit (saldo normal di debit)
+                $balances[$account->id] = $debit - $credit;
+                $totalProfit = $totalProfit - $balances[$account->id];
+            } else if ($categoryType == 4) {
+                // Liabilitas dan Ekuitas: Credit - Debit (saldo normal di kredit)
+                $balances[$account->id] = $credit - $debit;
+                $totalProfit = $totalProfit + $balances[$account->id];
+            }
+        }
+
+        // Kelompokkan akun berdasarkan kategori
+        $balanceSheet = [
+            'revenue' => [],
+            'expenses' => [],
+        ];
+
+        foreach ($accounts as $account) {
+            $categoryType = $account->account_number;
+
+            if (in_array($categoryType, [4])) {
+                $balanceSheet['revenue'][] = [
+                    'name' => $account->name,
+                    'balance' => $balances[$account->id],
+                ];
+            } elseif (in_array($categoryType, [5])) {
+                $balanceSheet['expenses'][] = [
+                    'name' => $account->name,
+                    'balance' => $balances[$account->id],
+                ];
+            }
+        }
+        $balanceSheet['total_profit'] = $totalProfit;
+        // return $this->getIncomeDetail($startDate, $endDate);
+        // // return $balanceSheet;
+        // return [
+        //     'start_date' => Carbon::parse($startDate)->format('d M Y'),
+        //     'end_date' => Carbon::parse($endDate)->format('d M Y'),
+        //     'company' => Company::first(),
+        //     'expenses' => $balanceSheet['expenses'],
+        //     'revenue' => $balanceSheet['revenue'],
+        // ];
+
+        return View('report.financial.incomestatement', [
+            'start_date' => Carbon::parse($startDate)->format('d M Y'),
+            'end_date' => Carbon::parse($endDate)->format('d M Y'),
+            'company' => Company::first(),
+            'expenses' => $balanceSheet['expenses'],
+            'revenue' => $balanceSheet['revenue'],
+        ]);
+
+        return pdf('report.financial.balancesheet', [
+            'start_date' => Carbon::parse($startDate)->format('d M Y'),
+            'end_date' => Carbon::parse($endDate)->format('d M Y'),
+            'company' => Company::first(),
+            'data' => $balanceSheet,
+        ])->download('report.pdf');
     }
 }

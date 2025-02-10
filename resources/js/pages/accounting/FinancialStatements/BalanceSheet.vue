@@ -35,6 +35,15 @@
 
                         <span v-else>Submit</span>
                     </Button>
+                    <a :href="route('report-balance-sheet')" target="_blank" as="button" class="">Logout</a>
+                    <Button type="button" @click="getReport()" :disabled="onProses">
+                        <span v-if="onProses" class="flex">
+                            <ReloadIcon class="mr-2 h-4 w-4 animate-spin" />
+                            Please wait
+                        </span>
+
+                        <span v-else>Report</span>
+                    </Button>
                 </div>
             </div>
 
@@ -54,14 +63,17 @@
                 <!-- Tabel Aset -->
 
                 <div class="my-4 flex w-2/4 flex-col">
-                    <Table class="w-full border">
-                        <TableHeader class="">
-                            <TableRow class="text-center font-bold uppercase text-black">
-                                <TableHead class="w-1/3">Assets</TableHead>
-                            </TableRow>
-                        </TableHeader>
-
-                        <TableBody class="w-full">
+                    <table class="w-full caption-bottom text-sm">
+                        <thead class="border-b">
+                            <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                                <th
+                                    class="h-10 w-1/3 px-2 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-0.5"
+                                >
+                                    Assets
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="w-full [&_tr:last-child]:border-0">
                             <tr class="w-full border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
                                 <td class="w-full px-2 align-middle font-bold [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-0.5">
                                     <div class="flex flex-row justify-between">
@@ -108,20 +120,23 @@
                                     </div>
                                 </td>
                             </tr>
-                        </TableBody>
-                    </Table>
+                        </tbody>
+                    </table>
                 </div>
 
                 <div class="my-4 flex w-2/4 flex-col space-y-4">
                     <div>
-                        <Table class="w-full border">
-                            <TableHeader class="">
-                                <TableRow class="text-center font-bold uppercase text-black">
-                                    <TableHead class="w-1/3">Liabilities</TableHead>
-                                </TableRow>
-                            </TableHeader>
-
-                            <TableBody class="w-full">
+                        <table class="w-full caption-bottom text-sm">
+                            <thead class="border-b">
+                                <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                                    <th
+                                        class="h-10 w-1/3 px-2 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-0.5"
+                                    >
+                                        Liabilities
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="w-full [&_tr:last-child]:border-0">
                                 <tr class="w-full border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
                                     <td class="w-full px-2 align-middle font-bold [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-0.5">
                                         <div class="flex flex-row justify-between">
@@ -168,18 +183,22 @@
                                         </div>
                                     </td>
                                 </tr>
-                            </TableBody>
-                        </Table>
+                            </tbody>
+                        </table>
                     </div>
                     <div>
-                        <Table class="w-full border">
-                            <TableHeader class="">
-                                <TableRow class="text-center font-bold uppercase text-black">
-                                    <TableHead class="w-1/3">Equity</TableHead>
-                                </TableRow>
-                            </TableHeader>
+                        <table class="w-full caption-bottom text-sm">
+                            <thead class="border-b">
+                                <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                                    <th
+                                        class="h-10 w-1/3 px-2 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-0.5"
+                                    >
+                                        Equity
+                                    </th>
+                                </tr>
+                            </thead>
 
-                            <TableBody class="w-full">
+                            <tbody class="w-full [&_tr:last-child]:border-0">
                                 <tr class="w-full border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
                                     <td class="w-full px-2 align-middle font-bold [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-0.5">
                                         <div class="flex flex-row justify-between">
@@ -226,8 +245,8 @@
                                         </div>
                                     </td>
                                 </tr>
-                            </TableBody>
-                        </Table>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -335,5 +354,12 @@ const fetchData = () => {
             },
         },
     );
+};
+
+const getReport = () => {
+    router.get(route('report-balance-sheet'), {
+        start_date: startDate.value,
+        end_date: endDate.value,
+    });
 };
 </script>

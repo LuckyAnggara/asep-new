@@ -71,6 +71,7 @@ Route::put('/settings/preferences/{id}', [SettingsController::class, 'updatePref
 Route::put('/settings/account/{id}', [SettingsController::class, 'updateAccount'])->middleware(['auth', 'verified'])->name('settings.updateAccount');
 Route::put('/settings/security/password', [SettingsController::class, 'updatePassword'])->name('user.updatePassword');
 
-Route::get('report/balance-sheet', [ReportController::class, 'index'])->name('trial-balance');
+Route::get('report/finance/balance-sheet', [ReportController::class, 'balancesheet'])->name('report-balance-sheet');
+Route::get('report/finance/income-statement', [ReportController::class, 'incomestatement'])->name('report-income-statement');
 
 require __DIR__ . '/auth.php';
