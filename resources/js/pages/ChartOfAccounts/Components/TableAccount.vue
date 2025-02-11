@@ -1,9 +1,7 @@
 <template>
     <div>
         <div class="flex items-center">
-            <h1 class="my-4 text-lg font-semibold md:text-2xl">
-                Chart Of Accounts (COA)
-            </h1>
+            <h1 class="my-4 text-lg font-semibold md:text-2xl">Chart Of Accounts (COA)</h1>
         </div>
         <div class="flex-1 flex-col items-center justify-center">
             <Button class="mb-4" @click="toCreate()">Tambah Data</Button>
@@ -12,24 +10,13 @@
                     <div class="relative grid w-full items-center gap-1.5">
                         <Label>Search</Label>
                         <div class="relative w-full">
-                            <Search
-                                class="absolute left-2 top-2.5 size-4 text-muted-foreground"
-                            />
-                            <Input
-                                v-model="search"
-                                placeholder="Search"
-                                class="pl-8"
-                            />
+                            <Search class="absolute left-2 top-2.5 size-4 text-muted-foreground" />
+                            <Input v-model="search" placeholder="Search" class="pl-8" />
                         </div>
                     </div>
                     <div class="w-18 relative grid items-center gap-1.5">
                         <Label>Filter</Label>
-                        <Button
-                            type="button"
-                            @click="isSheetFilterOpen = !isSheetFilterOpen"
-                            variant="outline"
-                            size="icon"
-                        >
+                        <Button type="button" @click="isSheetFilterOpen = !isSheetFilterOpen" variant="outline" size="icon">
                             <ListFilter :stroke-width="1.25" />
                         </Button>
                     </div>
@@ -50,14 +37,9 @@
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            <TableRow
-                                v-for="(item, index) in accounts"
-                                :key="item.id"
-                            >
+                            <TableRow v-for="(item, index) in accounts" :key="item.id">
                                 <TableCell>{{ index + 1 }} </TableCell>
-                                <TableCell
-                                    >{{ item.parent.category.name }}
-                                </TableCell>
+                                <TableCell>{{ item.parent.category.name }} </TableCell>
                                 <TableCell>{{ item.parent.name }} </TableCell>
                                 <TableCell>
                                     <span>{{ item.code }} </span>
@@ -71,31 +53,19 @@
                                 <TableCell>
                                     <DropdownMenu>
                                         <DropdownMenuTrigger as-child>
-                                            <EllipsisVertical
-                                                class="cursor-pointer"
-                                                :size="16"
-                                                :stroke-width="0.5"
-                                            />
+                                            <EllipsisVertical class="cursor-pointer" :size="16" :stroke-width="0.5" />
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent class="w-24">
-                                            <DropdownMenuLabel
-                                                >Actions</DropdownMenuLabel
-                                            >
+                                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                             <DropdownMenuSeparator />
                                             <DropdownMenuGroup>
                                                 <DropdownMenuItem
                                                     class="cursor-pointer"
-                                                    v-for="(
-                                                        action, actionIndex
-                                                    ) in actions"
+                                                    v-for="(action, actionIndex) in actions"
                                                     :key="actionIndex"
-                                                    @click="
-                                                        action.handler(item)
-                                                    "
+                                                    @click="action.handler(item)"
                                                 >
-                                                    <span>{{
-                                                        action.label
-                                                    }}</span>
+                                                    <span>{{ action.label }}</span>
                                                 </DropdownMenuItem>
                                             </DropdownMenuGroup>
                                         </DropdownMenuContent>
@@ -108,18 +78,8 @@
             </div>
         </div>
         <Create v-model="isCreateOpen" @close="isCreateOpen = false" />
-        <Edit
-            v-model:open="isEditOpen"
-            v-model:data="editData"
-            @close="isEditOpen = false"
-            :data="editData"
-        />
-        <DeleteDialog
-            v-model:open="isDeleteDialogOpen"
-            v-model:id="deleteId"
-            :route-link="'chart-of-accounts.destroy'"
-            @close="isDeleteDialogOpen = false"
-        />
+        <Edit v-model:open="isEditOpen" v-model:data="editData" @close="isEditOpen = false" :data="editData" />
+        <DeleteDialog v-model:open="isDeleteDialogOpen" v-model:id="deleteId" :route-link="'chart-of-accounts.destroy'" @close="isDeleteDialogOpen = false" />
 
         <Sheet v-model:open="isSheetFilterOpen">
             <SheetContent>
@@ -129,11 +89,7 @@
                 </SheetHeader>
                 <Separator />
                 <div class="my-6 flex flex-col space-y-6">
-                    <div
-                        class="grid items-center gap-1.5"
-                        v-for="(filter, index) in filtering"
-                        :key="index"
-                    >
+                    <div class="grid items-center gap-1.5" v-for="(filter, index) in filtering" :key="index">
                         <Label>{{ filter.label }}</Label>
                         <VueDatePicker
                             :preview-format="'dd/MMM/yyyy'"
@@ -151,11 +107,7 @@
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectGroup>
-                                    <SelectItem
-                                        v-for="(item, index) in filter.options"
-                                        :key="index"
-                                        :value="item.value"
-                                    >
+                                    <SelectItem v-for="(item, index) in filter.options" :key="index" :value="item.value">
                                         {{ item.label }}
                                     </SelectItem>
                                 </SelectGroup>
@@ -166,19 +118,13 @@
                 <Separator class="mb-3" />
                 <SheetFooter>
                     <SheetClose as-child>
-                        <Button
-                            type="button"
-                            @click="resetData"
-                            variant="outline"
-                        >
+                        <Button type="button" @click="resetData" variant="outline">
                             <span v-if="isLoading" class="flex">
                                 <ReloadIcon class="mr-2 h-4 w-4 animate-spin" />
                                 Please wait
                             </span>
 
-                            <span class="flex flex-row" v-else>
-                                <X class="mr-2 h-4 w-4" /> Reset
-                            </span>
+                            <span class="flex flex-row" v-else> <X class="mr-2 h-4 w-4" /> Reset </span>
                         </Button>
                     </SheetClose>
                     <SheetClose as-child>
@@ -188,9 +134,7 @@
                                 Please wait
                             </span>
 
-                            <span class="flex flex-row space-x-4" v-else>
-                                <ListFilter /> <span>Filter</span></span
-                            >
+                            <span class="flex flex-row space-x-4" v-else> <ListFilter /> <span>Filter</span></span>
                         </Button>
                     </SheetClose>
                 </SheetFooter>
@@ -220,33 +164,9 @@ import {
     DropdownMenuGroup,
     DropdownMenuItem,
 } from '@/components/ui/dropdown-menu';
-import {
-    Table,
-    TableBody,
-    TableHeader,
-    TableRow,
-    TableHead,
-    TableCell,
-} from '@/components/ui/table';
-import {
-    Sheet,
-    SheetContent,
-    SheetDescription,
-    SheetHeader,
-    SheetClose,
-    SheetFooter,
-    SheetTitle,
-    SheetTrigger,
-} from '@/components/ui/sheet';
-import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectLabel,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
+import { Table, TableBody, TableHeader, TableRow, TableHead, TableCell } from '@/components/ui/table';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetClose, SheetFooter, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { EllipsisVertical, ListFilter, Search, X } from 'lucide-vue-next';
 import { watchDebounced } from '@vueuse/core';
 import { ReloadIcon } from '@radix-icons/vue';
@@ -337,10 +257,7 @@ watchDebounced(
     paramater,
     (newVal, oldVal) => {
         // Cek jika hanya properti tertentu yang berubah
-        if (
-            Object.keys(newVal).length === Object.keys(oldVal).length &&
-            newVal.search === oldVal.search
-        ) {
+        if (Object.keys(newVal).length === Object.keys(oldVal).length && newVal.search === oldVal.search) {
             return;
         }
         getData(paramater.value);

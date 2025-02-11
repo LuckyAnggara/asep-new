@@ -1,5 +1,5 @@
 import { usePage } from '@inertiajs/vue3';
-import { BookOpenCheck, GalleryVerticalEnd, Settings2, SquareTerminal, UserCircle2 } from 'lucide-vue-next';
+import { BookOpenCheck, BoxesIcon, GalleryVerticalEnd, Settings2, SquareTerminal, UserCircle2 } from 'lucide-vue-next';
 import { defineStore } from 'pinia';
 const page = usePage();
 
@@ -103,6 +103,22 @@ export const useMainStore = defineStore('main', {
                 ],
             },
             {
+                title: 'Inventory',
+                header: '/inventory',
+                status: false,
+                icon: BoxesIcon,
+                items: [
+                    {
+                        title: 'Data',
+                        url: 'item.index',
+                    },
+                    {
+                        title: 'Baru',
+                        url: 'item.create',
+                    },
+                ],
+            },
+            {
                 title: 'Accounting',
                 icon: BookOpenCheck,
                 status: false,
@@ -148,6 +164,10 @@ export const useMainStore = defineStore('main', {
                     {
                         title: 'Account (COA)',
                         url: 'chart-of-accounts.index',
+                    },
+                    {
+                        title: 'Warehouse',
+                        url: 'warehouse.index',
                     },
 
                     {

@@ -39,6 +39,7 @@ const deleteItem = () => {
             toast({
                 title: 'Success',
                 description: `Data berhasil di hapus`,
+                position,
             });
             emit('close');
         },
@@ -57,30 +58,15 @@ const deleteItem = () => {
     <AlertDialog v-model:open="open">
         <AlertDialogContent>
             <AlertDialogHeader>
-                <AlertDialogTitle
-                    >Apakah Anda yakin ingin menghapus data
-                    ini?</AlertDialogTitle
-                >
-                <AlertDialogDescription>
-                    Tindakan ini tidak dapat dibatalkan. Ini akan secara
-                    menghapus data ini dari server.
-                </AlertDialogDescription>
+                <AlertDialogTitle>Apakah Anda yakin ingin menghapus data ini?</AlertDialogTitle>
+                <AlertDialogDescription> Tindakan ini tidak dapat dibatalkan. Ini akan secara menghapus data ini dari server. </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
                 <div class="flex flex-row space-x-2">
-                    <Button
-                        type="button"
-                        variant="outline"
-                        @click="emit('close')"
-                        :disabled="form.processing"
-                    >
+                    <Button type="button" variant="outline" @click="emit('close')" :disabled="form.processing">
                         <span>Cancel</span>
                     </Button>
-                    <Button
-                        type="button"
-                        @click="deleteItem()"
-                        :disabled="form.processing"
-                    >
+                    <Button type="button" @click="deleteItem()" :disabled="form.processing">
                         <span v-if="form.processing" class="flex">
                             <ReloadIcon class="mr-2 h-4 w-4 animate-spin" />
                             Please wait
