@@ -35,15 +35,16 @@
 
                         <span v-else>Submit</span>
                     </Button>
-                    <a :href="route('report-balance-sheet')" target="_blank" as="button" class="">Logout</a>
-                    <Button type="button" @click="getReport()" :disabled="onProses">
-                        <span v-if="onProses" class="flex">
-                            <ReloadIcon class="mr-2 h-4 w-4 animate-spin" />
-                            Please wait
-                        </span>
+                    <a :href="route('report-balance-sheet')" target="_blank" as="button" class="">
+                        <Button type="button" :disabled="onProses">
+                            <span v-if="onProses" class="flex">
+                                <ReloadIcon class="mr-2 h-4 w-4 animate-spin" />
+                                Please wait
+                            </span>
 
-                        <span v-else>Report</span>
-                    </Button>
+                            <span v-else>Report</span>
+                        </Button>
+                    </a>
                 </div>
             </div>
 

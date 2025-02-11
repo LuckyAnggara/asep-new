@@ -1,11 +1,5 @@
 import { usePage } from '@inertiajs/vue3';
-import {
-    BookOpenCheck,
-    GalleryVerticalEnd,
-    Settings2,
-    SquareTerminal,
-    UserCircle2,
-} from 'lucide-vue-next';
+import { BookOpenCheck, GalleryVerticalEnd, Settings2, SquareTerminal, UserCircle2 } from 'lucide-vue-next';
 import { defineStore } from 'pinia';
 const page = usePage();
 
@@ -130,18 +124,18 @@ export const useMainStore = defineStore('main', {
                         title: 'Trial Balance',
                         url: 'trial-balance',
                     },
-                    {
-                        title: 'Cash Flow',
-                        url: 'cash-flow.index',
-                    },
+                    // {
+                    //     title: 'Cash Flow',
+                    //     url: 'cash-flow.index',
+                    // },
                     {
                         title: 'Balance Sheet',
                         url: 'balance-sheet.index',
                     },
-                    {
-                        title: 'Detail Balance Sheet',
-                        url: 'detailed-balance-sheet',
-                    },
+                    // {
+                    //     title: 'Detail Balance Sheet',
+                    //     url: 'detailed-balance-sheet',
+                    // },
                 ],
             },
 

@@ -3,24 +3,22 @@
         <div class="flex items-center">
             <h1 class="text-lg font-semibold md:text-2xl">Journal Entry</h1>
         </div>
-        <div
-            class="flex-1 flex-col items-center justify-center rounded-lg border border-dashed p-6 shadow-sm"
-        >
-            <div class="flex-1 flex-col items-center justify-center">
-                <Button class="mb-4"
-                    ><Link :href="route('journal-entries.create')" as="button"
-                        >Tambah Data</Link
-                    ></Button
-                >
+        <div class="flex-1 flex-col items-center justify-center rounded-lg border border-dashed p-6 shadow-sm">
+            <div class="flex flex-col items-start justify-center">
+                <div class="flex flex-row space-x-4">
+                    <Button class="mb-4"><Link :href="route('journal-entries.create')" as="button">Tambah Data</Link></Button>
+                    <a :href="route('report-journal-summary')" target="_blank" as="button" class="">
+                        <Button type="button"> Report </Button>
+                    </a>
+                </div>
+
                 <Tabs :default-value="'header'" class="w-full">
                     <TabsList class="grid w-fit grid-cols-6">
                         <TabsTrigger value="header"> Header </TabsTrigger>
                         <TabsTrigger value="detail"> Detail </TabsTrigger>
                     </TabsList>
                     <TabsContent value="header">
-                        <div
-                            class="my-5 flex-1 flex-col items-center justify-center"
-                        >
+                        <div class="my-5 flex-1 flex-col items-center justify-center">
                             <ReusableTable
                                 :columns="columnMaster"
                                 :data="journalEntries.data"
@@ -34,9 +32,7 @@
                         </div>
                     </TabsContent>
                     <TabsContent value="detail">
-                        <div
-                            class="my-5 flex-1 flex-col items-center justify-center"
-                        >
+                        <div class="my-5 flex-1 flex-col items-center justify-center">
                             <ReusableTable
                                 :columns="columnDetail"
                                 :data="journalEntryDetails?.data"
@@ -50,12 +46,7 @@
                     </TabsContent>
                 </Tabs>
             </div>
-            <DeleteDialog
-                v-model:open="isDeleteDialogOpen"
-                v-model:id="deleteId"
-                :route-link="'journal-entries.destroy'"
-                @close="isDeleteDialogOpen = false"
-            />
+            <DeleteDialog v-model:open="isDeleteDialogOpen" v-model:id="deleteId" :route-link="'journal-entries.destroy'" @close="isDeleteDialogOpen = false" />
         </div>
     </AuthenticatedLayout>
 </template>

@@ -73,5 +73,7 @@ Route::put('/settings/security/password', [SettingsController::class, 'updatePas
 
 Route::get('report/finance/balance-sheet', [ReportController::class, 'balancesheet'])->name('report-balance-sheet');
 Route::get('report/finance/income-statement', [ReportController::class, 'incomestatement'])->name('report-income-statement');
+Route::get('report/finance/trial-balance', [ReportController::class, 'trialbalance'])->name('report-trial-balance');
+Route::get('report/finance/journal-summary', [ReportController::class, 'journalSummary'])->name('report-journal-summary');
 
 require __DIR__ . '/auth.php';

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AccountCategory;
 use App\Models\ChartOfAccount;
 use App\Models\Company;
+use App\Models\JournalEntry;
 use App\Models\JournalEntryDetail;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -98,6 +99,18 @@ class ReportController extends Controller
         //     'liabilities' => $categories[1],
         //     'equity' => $categories[2],
         // ]);
+        $timestamp = now()->timestamp; // Get current timestamp
+        $filename = "Balance Sheet Report {$timestamp}.pdf";
+
+        // return View('report.financial.balancesheet', [
+        //     'start_date' => Carbon::parse($startDate)->format('d M Y'),
+        //     'end_date' => Carbon::parse($endDate)->format('d M Y'),
+        //     'company' => Company::first(),
+        //     'assets' => $categories[0],
+        //     'liabilities' => $categories[1],
+        //     'equity' => $categories[2],
+        // ]);
+
 
         return pdf('report.financial.balancesheet', [
             'start_date' => Carbon::parse($startDate)->format('d M Y'),
@@ -106,7 +119,7 @@ class ReportController extends Controller
             'assets' => $categories[0],
             'liabilities' => $categories[1],
             'equity' => $categories[2],
-        ])->download('report.pdf');
+        ])->download($filename);
         // return pdf('report', [
         //     'invoiceNumber' => '1234',
         //     'customerName' => 'Grumpy Cat',
@@ -181,29 +194,120 @@ class ReportController extends Controller
             }
         }
         $balanceSheet['total_profit'] = $totalProfit;
-        // return $this->getIncomeDetail($startDate, $endDate);
-        // // return $balanceSheet;
-        // return [
+        $timestamp = now()->timestamp; // Get current timestamp
+        $filename = "Income Statement Report {$timestamp}.pdf";
+        // return View('report.financial.incomestatement', [
         //     'start_date' => Carbon::parse($startDate)->format('d M Y'),
         //     'end_date' => Carbon::parse($endDate)->format('d M Y'),
         //     'company' => Company::first(),
         //     'expenses' => $balanceSheet['expenses'],
         //     'revenue' => $balanceSheet['revenue'],
-        // ];
+        // ]);
 
-        return View('report.financial.incomestatement', [
+        return pdf('report.financial.incomestatement', [
             'start_date' => Carbon::parse($startDate)->format('d M Y'),
             'end_date' => Carbon::parse($endDate)->format('d M Y'),
             'company' => Company::first(),
             'expenses' => $balanceSheet['expenses'],
             'revenue' => $balanceSheet['revenue'],
-        ]);
+        ])->download($filename);
+    }
 
-        return pdf('report.financial.balancesheet', [
+    public function trialbalance(Request $request)
+    {
+        // Ambil tanggal periode dari request (default bulan ini)
+        $startDate = $request->input('start_date', Carbon::now()->startOfYear()->format('Y-m-d'));
+        $endDate = $request->input('end_date', Carbon::now()->format('Y-m-d'));
+
+
+        // Ambil semua akun
+        $accounts = ChartOfAccount::with(['journalEntryDetail.journalEntry'])->orderBy('code')->get();
+
+        $trialBalance = $accounts->map(function ($account) use ($startDate, $endDate) {
+            $accountId = $account->id;
+
+            // **1. Hitung Saldo Awal dari Jurnal Opening Balance (OB)**
+            $opening_balance = JournalEntryDetail::where('chart_of_accounts_id', $accountId)
+                ->whereHas('journalEntry', function ($query) {
+                    $query->where('reference', 'LIKE', 'OB-%');
+                })
+                ->sum('debit') - JournalEntryDetail::where('chart_of_accounts_id', $accountId)
+                ->whereHas('journalEntry', function ($query) {
+                    $query->where('reference', 'LIKE', 'OB-%');
+                })
+                ->sum('credit');
+
+            // **2. Hitung Total Debit & Kredit selama Periode**
+            $totalDebit = JournalEntryDetail::where('chart_of_accounts_id', $accountId)
+                ->whereHas('journalEntry', function ($query) use ($startDate, $endDate) {
+                    $query->whereBetween('date', [$startDate, $endDate]);
+                })
+                ->sum('debit');
+
+            $totalCredit = JournalEntryDetail::where('chart_of_accounts_id', $accountId)
+                ->whereHas('journalEntry', function ($query) use ($startDate, $endDate) {
+                    $query->whereBetween('date', [$startDate, $endDate]);
+                })
+                ->sum('credit');
+
+            // **3. Hitung Saldo Akhir**
+            $closing_balance = $opening_balance + $totalDebit - $totalCredit;
+
+            return [
+                'account_id' => $account->id,
+                'account_code' => $account->code,
+                'account_name' => $account->name,
+                'opening_balance' => $opening_balance,
+                'debit' => $totalDebit,
+                'credit' => $totalCredit,
+                'closing_balance' => $closing_balance,
+            ];
+        });
+
+
+        $timestamp = now()->timestamp; // Get current timestamp
+        $filename = "Trial Balance Report {$timestamp}.pdf";
+
+
+        // return View('report.financial.trialbalance', [
+        //     'trialBalance' => $trialBalance,
+        //     'start_date' => Carbon::parse($startDate)->format('d M Y'),
+        //     'end_date' => Carbon::parse($endDate)->format('d M Y'),
+        //     'company' => Company::first(),
+        // ]);
+
+        return pdf('report.financial.trialbalance', [
+            'trialBalance' => $trialBalance,
             'start_date' => Carbon::parse($startDate)->format('d M Y'),
             'end_date' => Carbon::parse($endDate)->format('d M Y'),
             'company' => Company::first(),
-            'data' => $balanceSheet,
-        ])->download('report.pdf');
+        ])->download($filename);
+    }
+
+    public function journalSummary(Request $request)
+    {
+        $startDate = $request->input('start_date', Carbon::now()->startOfYear());
+        $endDate = $request->input('end_date', Carbon::now()->endOfMonth());
+
+        $journals = JournalEntry::with('details.chartOfAccounts.subCategory')
+            ->whereBetween('date', [$startDate, $endDate])
+            ->get();
+
+        return view('report.financial.journalsummary', [
+            'start_date' => Carbon::parse($startDate)->format('d M Y'),
+            'end_date' => Carbon::parse($endDate)->format('d M Y'),
+            'company' => Company::first(),
+            'journals' => $journals,
+        ]);
+
+        $timestamp = now()->timestamp; // Get current timestamp
+        $filename = "Journal Summary Report {$timestamp}.pdf";
+
+        return pdf('report.financial.journalsummary', [
+            'start_date' => Carbon::parse($startDate)->format('d M Y'),
+            'end_date' => Carbon::parse($endDate)->format('d M Y'),
+            'company' => Company::first(),
+            'journals' => $journals,
+        ])->download($filename);
     }
 }

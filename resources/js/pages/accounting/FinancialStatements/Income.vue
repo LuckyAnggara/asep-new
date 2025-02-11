@@ -3,9 +3,7 @@
         <div class="flex items-center">
             <h1 class="font-semibold md:text-2xl">Profit / Loss Statement</h1>
         </div>
-        <div
-            class="flex-1 flex-col items-center justify-center rounded-lg border border-dashed p-6 shadow-sm"
-        >
+        <div class="flex-1 flex-col items-center justify-center rounded-lg border border-dashed p-6 shadow-sm">
             <!-- Filter Tanggal -->
             <div class="grid w-fit gap-2">
                 <Label for="reference">Tanggal Data</Label>
@@ -28,11 +26,7 @@
                         :dark="mode == 'dark'"
                     ></VueDatePicker>
                     <!-- Submit Button -->
-                    <Button
-                        type="button"
-                        @click="fetchData()"
-                        :disabled="onProses"
-                    >
+                    <Button type="button" @click="fetchData()" :disabled="onProses">
                         <span v-if="onProses" class="flex">
                             <ReloadIcon class="mr-2 h-4 w-4 animate-spin" />
                             Please wait
@@ -40,6 +34,16 @@
 
                         <span v-else>Submit</span>
                     </Button>
+                    <a :href="route('report-income-statement')" target="_blank" as="button" class="">
+                        <Button type="button" :disabled="onProses">
+                            <span v-if="onProses" class="flex">
+                                <ReloadIcon class="mr-2 h-4 w-4 animate-spin" />
+                                Please wait
+                            </span>
+
+                            <span v-else>Report</span>
+                        </Button>
+                    </a>
                 </div>
             </div>
 
@@ -50,21 +54,14 @@
                     <h2 class="mb-2 font-semibold">Revenue</h2>
                     <Table class="border">
                         <TableHeader class="">
-                            <TableRow
-                                class="text-center font-bold uppercase text-black"
-                            >
+                            <TableRow class="text-center font-bold uppercase text-black">
                                 <TableHead class="w-1/3">Nama Akun</TableHead>
-                                <TableHead class="w-1/3 text-right"
-                                    >Saldo</TableHead
-                                >
+                                <TableHead class="w-1/3 text-right">Saldo</TableHead>
                             </TableRow>
                         </TableHeader>
 
                         <TableBody>
-                            <TableRow
-                                v-for="asset in revenue"
-                                :key="asset.name"
-                            >
+                            <TableRow v-for="asset in revenue" :key="asset.name">
                                 <TableCell> {{ asset.name }}</TableCell>
                                 <TableCell class="border text-right">
                                     <span v-if="!onProses">
@@ -78,9 +75,7 @@
                         </TableBody>
                         <TableFooter>
                             <TableRow class="font-bold">
-                                <TableCell class="text-right"
-                                    >Total Revenue</TableCell
-                                >
+                                <TableCell class="text-right">Total Revenue</TableCell>
                                 <TableCell class="text-right font-bold">
                                     <span v-if="!onProses">
                                         {{ formatCurrency(totalRevenue) }}
@@ -100,20 +95,13 @@
                     <h2 class="mb-2 text-xl font-semibold">Expenses</h2>
                     <Table class="border">
                         <TableHeader class="">
-                            <TableRow
-                                class="text-center font-bold uppercase text-black"
-                            >
+                            <TableRow class="text-center font-bold uppercase text-black">
                                 <TableHead class="w-1/3">Nama Akun</TableHead>
-                                <TableHead class="w-1/3 text-right"
-                                    >Saldo</TableHead
-                                >
+                                <TableHead class="w-1/3 text-right">Saldo</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            <TableRow
-                                v-for="asset in expenses"
-                                :key="asset.name"
-                            >
+                            <TableRow v-for="asset in expenses" :key="asset.name">
                                 <TableCell> {{ asset.name }}</TableCell>
                                 <TableCell class="border text-right">
                                     <span v-if="!onProses">
@@ -127,9 +115,7 @@
                         </TableBody>
                         <TableFooter>
                             <TableRow class="font-bold">
-                                <TableCell class="text-right"
-                                    >Total Liabilities</TableCell
-                                >
+                                <TableCell class="text-right">Total Liabilities</TableCell>
                                 <TableCell class="text-right font-bold">
                                     <span v-if="!onProses">
                                         {{ formatCurrency(totalExpenses) }}
@@ -148,15 +134,12 @@
                 <Table class="border bg-gray-500 dark:bg-gray-700">
                     <TableFooter>
                         <TableRow class="font-bold">
-                            <TableCell class="w-2/3 text-right uppercase"
-                                >Total Profit / Loss</TableCell
-                            >
+                            <TableCell class="w-2/3 text-right uppercase">Total Profit / Loss</TableCell>
                             <TableCell class="text-right font-bold">
                                 <span v-if="!onProses">
                                     {{ formatCurrency(total_profit) }}
                                 </span>
-                                <span v-else>
-                                    <Skeleton class="h-5 w-full" /> </span
+                                <span v-else> <Skeleton class="h-5 w-full" /> </span
                             ></TableCell>
                         </TableRow>
                     </TableFooter>
@@ -175,16 +158,7 @@ import { router, Link } from '@inertiajs/vue3';
 import Label from '@/components/ui/label/Label.vue';
 import { formatCurrency } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
-import {
-    Table,
-    TableBody,
-    TableCaption,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-    TableFooter,
-} from '@/components/ui/table';
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow, TableFooter } from '@/components/ui/table';
 import { ReloadIcon } from '@radix-icons/vue';
 
 const mode = useColorMode();

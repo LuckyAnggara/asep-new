@@ -1,14 +1,6 @@
 <script setup>
 import { computed, defineProps } from 'vue';
-import {
-    Table,
-    TableHeader,
-    TableRow,
-    TableHead,
-    TableBody,
-    TableCell,
-    TableFooter,
-} from '@/Components/ui/table';
+import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell, TableFooter } from '@/Components/ui/table';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import Button from '@/Components/ui/button/Button.vue';
 import Label from '@/Components/ui/label/Label.vue';
@@ -30,17 +22,11 @@ const onProses = ref(false);
 const mode = useColorMode();
 
 const totalDebit = computed(() => {
-    return props.trialBalance.reduce(
-        (sum, entry) => sum + parseFloat(entry.debit || 0),
-        0,
-    );
+    return props.trialBalance.reduce((sum, entry) => sum + parseFloat(entry.debit || 0), 0);
 });
 
 const totalCredit = computed(() => {
-    return props.trialBalance.reduce(
-        (sum, entry) => sum + parseFloat(entry.credit || 0),
-        0,
-    );
+    return props.trialBalance.reduce((sum, entry) => sum + parseFloat(entry.credit || 0), 0);
 });
 
 const fetchData = () => {
@@ -87,9 +73,7 @@ const toLedger = (i) => {
         <div class="flex items-center">
             <h1 class="text-lg font-semibold md:text-2xl">Trial Balance</h1>
         </div>
-        <div
-            class="flex-1 flex-col items-center justify-center rounded-lg border border-dashed p-6 shadow-sm"
-        >
+        <div class="flex-1 flex-col items-center justify-center rounded-lg border border-dashed p-6 shadow-sm">
             <!-- Filter Tanggal -->
             <div class="grid w-fit gap-2">
                 <Label for="reference">Tanggal Data</Label>
@@ -112,11 +96,7 @@ const toLedger = (i) => {
                         :dark="mode == 'dark'"
                     ></VueDatePicker>
                     <!-- Submit Button -->
-                    <Button
-                        type="button"
-                        @click="fetchData()"
-                        :disabled="onProses"
-                    >
+                    <Button type="button" @click="fetchData()" :disabled="onProses">
                         <span v-if="onProses" class="flex">
                             <ReloadIcon class="mr-2 h-4 w-4 animate-spin" />
                             Please wait
@@ -124,10 +104,21 @@ const toLedger = (i) => {
 
                         <span v-else>Submit</span>
                     </Button>
+
+                    <a :href="route('report-trial-balance')" target="_blank" as="button" class="">
+                        <Button type="button" :disabled="onProses">
+                            <span v-if="onProses" class="flex">
+                                <ReloadIcon class="mr-2 h-4 w-4 animate-spin" />
+                                Please wait
+                            </span>
+
+                            <span v-else>Report</span>
+                        </Button>
+                    </a>
                 </div>
             </div>
 
-            <div class="my-4 flex flex-col space-y-4 xl:w-2/3">
+            <div class="my-4 flex flex-col space-y-4">
                 <!-- Tabel Revenue -->
                 <Table>
                     <TableHeader>
@@ -137,17 +128,12 @@ const toLedger = (i) => {
                             <TableHead class="text-right">Saldo Awal</TableHead>
                             <TableHead class="text-right">Debit</TableHead>
                             <TableHead class="text-right">Kredit</TableHead>
-                            <TableHead class="text-right"
-                                >Saldo Akhir</TableHead
-                            >
+                            <TableHead class="text-right">Saldo Akhir</TableHead>
                         </TableRow>
                     </TableHeader>
 
                     <TableBody>
-                        <TableRow
-                            v-for="(account, index) in props.trialBalance"
-                            :key="index"
-                        >
+                        <TableRow v-for="(account, index) in props.trialBalance" :key="index">
                             <TableCell>
                                 <span v-if="!onProses">
                                     {{ account.account_code }}
@@ -157,72 +143,41 @@ const toLedger = (i) => {
                                 </span>
                             </TableCell>
                             <TableCell>
-                                <span
-                                    class="cursor-pointer"
-                                    v-if="!onProses"
-                                    @click="toLedger(account.account_id)"
-                                >
+                                <span class="cursor-pointer" v-if="!onProses" @click="toLedger(account.account_id)">
                                     {{ account.account_name }}
                                 </span>
-                                <span v-else>
-                                    <Skeleton class="h-5 w-full" /> </span
+                                <span v-else> <Skeleton class="h-5 w-full" /> </span
                             ></TableCell>
                             <TableCell class="text-right">
                                 <span v-if="!onProses">
-                                    {{
-                                        account.opening_balance == 0
-                                            ? '-'
-                                            : formatCurrency(
-                                                  account.opening_balance,
-                                              )
-                                    }}
+                                    {{ account.opening_balance == 0 ? '-' : formatCurrency(account.opening_balance) }}
                                 </span>
-                                <span v-else>
-                                    <Skeleton class="h-5 w-full" /> </span
+                                <span v-else> <Skeleton class="h-5 w-full" /> </span
                             ></TableCell>
                             <TableCell class="text-right">
                                 <span v-if="!onProses">
-                                    {{
-                                        account.debit == 0
-                                            ? '-'
-                                            : formatCurrency(account.debit)
-                                    }}
+                                    {{ account.debit == 0 ? '-' : formatCurrency(account.debit) }}
                                 </span>
-                                <span v-else>
-                                    <Skeleton class="h-5 w-full" /> </span
+                                <span v-else> <Skeleton class="h-5 w-full" /> </span
                             ></TableCell>
                             <TableCell class="text-right">
                                 <span v-if="!onProses">
-                                    {{
-                                        account.credit == 0
-                                            ? '-'
-                                            : formatCurrency(account.credit)
-                                    }}
+                                    {{ account.credit == 0 ? '-' : formatCurrency(account.credit) }}
                                 </span>
-                                <span v-else>
-                                    <Skeleton class="h-5 w-full" /> </span
+                                <span v-else> <Skeleton class="h-5 w-full" /> </span
                             ></TableCell>
                             <TableCell class="text-right">
                                 <span v-if="!onProses">
-                                    {{
-                                        account.closing_balance == 0
-                                            ? '-'
-                                            : formatCurrency(
-                                                  account.closing_balance,
-                                              )
-                                    }}
+                                    {{ account.closing_balance == 0 ? '-' : formatCurrency(account.closing_balance) }}
                                 </span>
-                                <span v-else>
-                                    <Skeleton class="h-5 w-full" /> </span
+                                <span v-else> <Skeleton class="h-5 w-full" /> </span
                             ></TableCell>
                         </TableRow>
                     </TableBody>
 
                     <TableFooter>
                         <TableRow class="font-bold">
-                            <TableCell class="text-right" colspan="3"
-                                >Total</TableCell
-                            >
+                            <TableCell class="text-right" colspan="3">Total</TableCell>
                             <TableCell class="text-right font-bold">
                                 <span v-if="!onProses">
                                     {{ formatCurrency(totalDebit) }}
@@ -239,8 +194,7 @@ const toLedger = (i) => {
                                     <Skeleton class="h-5 w-full" />
                                 </span>
                             </TableCell>
-                            <TableCell class="text-right font-bold">
-                            </TableCell>
+                            <TableCell class="text-right font-bold"> </TableCell>
                         </TableRow>
                     </TableFooter>
                 </Table>
