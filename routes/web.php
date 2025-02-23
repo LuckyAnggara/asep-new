@@ -88,4 +88,6 @@ Route::resource('inventory/item', ItemController::class)
 Route::resource('inventory/item-category', ItemCategoryController::class)
     ->middleware(['auth', 'verified']);
 
+Route::get('/item/check-sku', [ItemController::class, 'checkSku'])->name('item.checkSku');
+
 require __DIR__ . '/auth.php';

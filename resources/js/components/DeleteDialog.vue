@@ -12,8 +12,9 @@ import {
 } from '@/Components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { useForm } from '@inertiajs/vue3';
-import { useToast } from '@/Components/ui/toast/use-toast';
+// import { useToast } from '@/Components/ui/toast/use-toast';
 import { ReloadIcon } from '@radix-icons/vue';
+import { Toaster, toast } from 'vue-sonner';
 
 const open = defineModel('open');
 const id = defineModel('id');
@@ -28,7 +29,7 @@ const props = defineProps({
 
 const form = useForm();
 
-const { toast } = useToast();
+// const { toast } = useToast();
 
 const deleteItem = () => {
     form.delete(route(props.routeLink, id.value), {
@@ -36,25 +37,28 @@ const deleteItem = () => {
         async: true,
         preserveState: true,
         onSuccess: (x) => {
-            toast({
-                title: 'Success',
-                description: `Data berhasil di hapus`,
-                position,
-            });
+            toast.success('Data berhasil dihapus!');
+            // toast({
+            //     title: 'Success',
+            //     description: `Data berhasil di hapus`,
+            // });
             emit('close');
         },
         onError: (errors) => {
-            toast({
-                title: 'Error',
-                description: errors,
-                variant: 'destructive',
-            });
+            toast.error(errors.name?.[0] || 'Ada permasalahan saat menghapus data');
+            // toast({
+            //     title: 'Error',
+            //     description: errors,
+            //     variant: 'destructive',
+            // });
         },
     });
 };
 </script>
 
 <template>
+    <!-- <Toaster position="bottom-center" /> -->
+
     <AlertDialog v-model:open="open">
         <AlertDialogContent>
             <AlertDialogHeader>

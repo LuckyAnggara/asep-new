@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Item;
 use App\Models\ItemCategory;
+use App\Models\Unit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -11,112 +12,163 @@ use Inertia\Response;
 
 class ItemController extends Controller
 {
-    public function index()
+    /**
+     * Display a listing of the items with filtering and pagination.
+     */
+    public function index(Request $request): Response
     {
-        $items = Item::with('category')->get();
-        $categories = ItemCategory::all();
+        $query = Item::with(['category', 'unit']);
+        $limit = $request->input('limit', 10);
+
+        if ($request->has('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+            $query->orWhere('sku', 'like', '%' . $request->search . '%');
+        }
+
+        if ($request->has('sortBy')) {
+            if ($request->sortBy == 'default') {
+                $query->orderBy('id', 'asc');
+            }
+            switch ($request->sortBy) {
+                case 'name_az':
+                    $query->orderBy('name', 'asc');
+                    break;
+                case 'price_low_high':
+                    $query->orderBy('selling_price', 'asc');
+                    break;
+                case 'price_high_low':
+                    $query->orderBy('selling_price', 'desc');
+                    break;
+                case 'lowest_stock':
+                    $query->orderBy('minimum_stock', 'asc');
+                    break;
+            }
+        }
+
+        if ($request->has('category')) {
+            if ($request->category == '' || $request->category == '0') {
+            } else {
+                $query->where('category_id', $request->category);
+            }
+        }
+
+        $items = $query->paginate($limit)->withQueryString();
 
         return Inertia::render('Inventory/Item/Index', [
             'items' => $items,
-            'categories' => $categories,
+            'filters' => $request->only(['search', 'category', 'limit']),
+            'categories' => ItemCategory::all()
         ]);
     }
 
-    public function create()
+    /**
+     * Show the form for creating a new item.
+     */
+    public function create(): Response
     {
-        return Inertia::render('Inventory/Item/Create', []);
+        return Inertia::render('Inventory/Item/Create', [
+            'categories' => ItemCategory::all(),
+            'units' => Unit::all()
+        ]);
     }
 
+    /**
+     * Store a newly created item in storage.
+     */
     public function store(Request $request)
     {
-        $request->validate([
-            'sku' => 'required|string|max:50|unique:items,sku',
+        $validated = $request->validate([
+            'sku' => 'required|unique:items,sku|max:255',
             'name' => 'required|string|max:255',
-            'barcode' => 'nullable|string|max:50|unique:items,barcode',
-            'category_id' => 'required|exists:categories,id',
-            'image' => 'nullable|image|max:2048',
-            'variations' => 'nullable|array',
-            'cogs' => 'required|numeric|min:0',
-            'price' => 'required|numeric|min:0',
-            'min_stock' => 'required|integer|min:0',
-            'weight' => 'nullable|numeric|min:0',
-            'description' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpg,png,jpeg,gif|max:2048',
+            'minimum_stock' => 'required|integer|min:0',
+            'cost_price' => 'required|numeric|min:0',
+            'selling_price' => 'required|numeric|min:0',
+            'category_id' => 'required|exists:item_categories,id',
+            'unit_id' => 'required|exists:units,id',
         ]);
 
-        $imagePath = $request->file('image') ? $request->file('image')->store('items', 'public') : null;
+        $count = Item::where('category_id', $validated['category_id'])->count() + 1;
+        $categoryCode = str_pad($validated['category_id'], 3, '0', STR_PAD_LEFT);
+        $itemCode = str_pad($count, 4, '0', STR_PAD_LEFT);
+        $validated['sku'] = "CAT{$categoryCode}-{$itemCode}"; // Generate SKU
 
-        Item::create([
-            'sku' => $request->sku,
-            'name' => $request->name,
-            'barcode' => $request->barcode,
-            'category_id' => $request->category_id,
-            'image' => $imagePath,
-            'variations' => json_encode($request->variations),
-            'cogs' => $request->cogs,
-            'price' => $request->price,
-            'min_stock' => $request->min_stock,
-            'weight' => $request->weight,
-            'description' => $request->description,
-        ]);
+        if ($request->hasFile('image')) {
+            $validated['image'] = $request->file('image')->store('items', 'public');
+        }
 
-        return redirect()->back()->with('success', 'Item added successfully.');
+        Item::create($validated);
+        return redirect()->route('item.index');
     }
 
+    /**
+     * Display the specified item.
+     */
+    public function show(Item $item): Response
+    {
+        return Inertia::render('Items/Show', [
+            'item' => $item->load(['category', 'unit'])
+        ]);
+    }
+
+    /**
+     * Show the form for editing the specified item.
+     */
+    public function edit(Item $item): Response
+    {
+        return Inertia::render('Items/Edit', [
+            'item' => $item,
+            'categories' => ItemCategory::all(),
+            'units' => Unit::all()
+        ]);
+    }
+
+    /**
+     * Update the specified item in storage.
+     */
     public function update(Request $request, Item $item)
     {
-        $request->validate([
-            'sku' => 'required|string|max:50|unique:items,sku,' . $item->id,
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'barcode' => 'nullable|string|max:50|unique:items,barcode,' . $item->id,
-            'category_id' => 'required|exists:categories,id',
-            'image' => 'nullable|image|max:2048',
-            'variations' => 'nullable|array',
-            'cogs' => 'required|numeric|min:0',
-            'price' => 'required|numeric|min:0',
-            'min_stock' => 'required|integer|min:0',
-            'weight' => 'nullable|numeric|min:0',
-            'description' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpg,png,jpeg,gif|max:2048',
+            'minimum_stock' => 'required|integer|min:0',
+            'cost_price' => 'required|numeric|min:0',
+            'selling_price' => 'required|numeric|min:0',
+            'category_id' => 'required|exists:item_categories,id',
+            'unit_id' => 'required|exists:units,id',
         ]);
 
         if ($request->hasFile('image')) {
-            if ($item->image) Storage::disk('public')->delete($item->image);
-            $imagePath = $request->file('image')->store('items', 'public');
-        } else {
-            $imagePath = $item->image;
+            if ($item->image) {
+                Storage::disk('public')->delete($item->image);
+            }
+            $validated['image'] = $request->file('image')->store('items', 'public');
         }
 
-        $item->update([
-            'sku' => $request->sku,
-            'name' => $request->name,
-            'barcode' => $request->barcode,
-            'category_id' => $request->category_id,
-            'image' => $imagePath,
-            'variations' => json_encode($request->variations),
-            'cogs' => $request->cogs,
-            'price' => $request->price,
-            'min_stock' => $request->min_stock,
-            'weight' => $request->weight,
-            'description' => $request->description,
-        ]);
-
-        return redirect()->back()->with('success', 'Item updated successfully.');
+        $item->update($validated);
+        return redirect()->route('item.index');
     }
 
-    public function show(Item $item)
-    {
-        $categories = ItemCategory::all();
-
-        return Inertia::render('Inventory/Item/Edit', [
-            'items' => $items,
-            'categories' => $categories,
-        ]);
-    }
-
+    /**
+     * Remove the specified item from storage.
+     */
     public function destroy(Item $item)
     {
-        if ($item->image) Storage::disk('public')->delete($item->image);
+        if ($item->image) {
+            Storage::disk('public')->delete($item->image);
+        }
         $item->delete();
+        return redirect()->route('item.index');
+    }
 
-        return redirect()->back()->with('success', 'Item deleted successfully.');
+    public function checkSku(Request $request)
+    {
+        $request->validate([
+            'sku' => 'required|string|max:255'
+        ]);
+
+        $exists = Item::where('sku', $request->sku)->exists();
+
+        return response()->json(['exists' => $exists]);
     }
 }

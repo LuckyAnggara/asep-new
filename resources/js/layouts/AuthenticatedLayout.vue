@@ -3,7 +3,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { vAutoAnimate } from '@formkit/auto-animate/vue';
 import { Link, router, usePage } from '@inertiajs/vue3';
 import { useMainStore } from '@/stores/main';
-import Toaster from '@/components/ui/toast/Toaster.vue';
+// import Toaster from '@/components/ui/toast/Toaster.vue';
+import { Toaster } from 'vue-sonner';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@iconify/vue';
 import { useColorMode } from '@vueuse/core';
@@ -251,7 +252,7 @@ function active(item) {
             <main class="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6" v-auto-animate>
                 <!-- Page Content -->
 
-                <Toaster />
+                <Toaster position="bottom-center" />
                 <slot />
             </main>
         </SidebarInset>

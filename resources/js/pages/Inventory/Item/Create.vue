@@ -1,131 +1,218 @@
 <script setup>
-import { useForm } from '@inertiajs/vue3';
-import { ref } from 'vue';
-import { Button } from '@/Components/ui/button';
-import { Input } from '@/Components/ui/input';
-import { Label } from '@/Components/ui/label';
-import { Select, SelectItem } from '@/Components/ui/select';
+import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue';
+import { ref, reactive, watch, computed } from 'vue';
+import { useForm, router, usePage } from '@inertiajs/vue3';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { NumberField, NumberFieldContent, NumberFieldDecrement, NumberFieldIncrement, NumberFieldInput } from '@/components/ui/number-field';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
+import { useToast } from '@/components/ui/toast';
+import { useDebounceFn } from '@vueuse/core';
+import { toast } from 'vue-sonner';
+import { ReloadIcon } from '@radix-icons/vue';
 
-// Props
+const page = usePage();
+const company = computed(() => page.props.auth.company);
 const props = defineProps({
     categories: Array,
+    units: Array,
 });
 
-// Form setup
-const form = useForm({
-    sku: '',
-    name: '',
-    barcode: '',
-    category_id: '',
-    image: null,
-    cogs: '',
-    price: '',
-    min_stock: '',
-    weight: '',
-    description: '',
-    variations: [],
-});
+// const { toast } = useToast();
+const previewImage = ref(null);
+const autoSku = ref(false);
+const skuExists = ref(false);
+const loadingSkuCheck = ref(false);
 
-// Handle file upload
-const handleFileUpload = (event) => {
-    form.image = event.target.files[0];
+const formatOptions = {
+    style: 'currency',
+    currency: company.value.currency,
+    minimumFractionDigits: company.value.decimal,
+    currencyDisplay: 'code',
+    currencySign: 'accounting',
 };
 
-// 🛠 Manage Variations
-const variationName = ref('');
-const variationOptions = ref('');
+const form = useForm({
+    name: '',
+    sku: '',
+    image: null,
+    minimum_stock: 1,
+    cost_price: 0,
+    selling_price: 0,
+    category_id: null,
+    unit_id: null,
+    description: null,
+});
 
-// ➕ Add New Variation
-const addVariation = () => {
-    if (variationName.value && variationOptions.value) {
-        form.variations.push({
-            name: variationName.value,
-            options: variationOptions.value.split(',').map((opt) => opt.trim()), // Convert to array
-        });
-        variationName.value = '';
-        variationOptions.value = '';
+// Handle File Upload
+const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+        form.image = file;
+        previewImage.value = URL.createObjectURL(file);
     }
 };
 
-// ❌ Remove Variation
-const removeVariation = (index) => {
-    form.variations.splice(index, 1);
+const generateSku = () => {
+    if (autoSku.value) {
+        const categoryCode = form.category_id ? String(form.category_id).padStart(3, '0') : '000';
+        const timestamp = Date.now().toString().slice(-4); // 4-digit timestamp
+        form.sku = `SKU-${categoryCode}-${timestamp}`;
+    } else {
+        // form.sku == '' ? (form.sku = '') : form.sku; // Allow manual input
+    }
 };
 
-// Submit Form
-const submit = () => {
-    form.post(route('items.store'));
+watch(() => form.category_id, generateSku);
+
+// Handle Submit
+const submitForm = () => {
+    form.post(route('item.store'), {
+        onSuccess: () => {
+            toast.success('Data berhasil ditambahkan!');
+        },
+        onError: (errors) => {
+            toast.error(errors.name?.[0] || 'Ada permasalahan saat menambah data');
+        },
+    });
 };
+
+const checkSku = useDebounceFn(async () => {
+    if (!form.sku) return;
+    loadingSkuCheck.value = true;
+
+    try {
+        const response = await axios.get(route('item.checkSku'), { params: { sku: form.sku } });
+        skuExists.value = response.data.exists;
+    } finally {
+        loadingSkuCheck.value = false;
+    }
+}, 1000);
 </script>
 
 <template>
-    <div class="mx-auto max-w-3xl rounded-lg bg-white p-6 shadow-lg">
-        <h1 class="mb-4 text-2xl font-bold">➕ Add New Item</h1>
+    <AuthenticatedLayout>
+        <div class="flex items-center">
+            <h1 class="text-lg font-semibold md:text-2xl">Tambah Item Baru</h1>
+        </div>
+        <div class="flex-1 flex-col items-center justify-center rounded-lg border border-dashed p-6 shadow-sm">
+            <form @submit.prevent="submitForm" class="flex flex-col space-y-4">
+                <div class="flex w-full flex-row space-x-4">
+                    <div class="flex w-1/2 flex-col space-y-4">
+                        <!-- SKU / Kode Barang -->
+                        <div class="flex items-center space-x-2">
+                            <input type="checkbox" v-model="autoSku" @change="generateSku" />
+                            <label for="terms" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                Generate SKU Automatically
+                            </label>
+                        </div>
 
-        <form @submit.prevent="submit" class="space-y-4">
-            <div>
-                <Label>SKU</Label>
-                <Input v-model="form.sku" type="text" required />
-            </div>
-            <div>
-                <Label>Name</Label>
-                <Input v-model="form.name" type="text" required />
-            </div>
-            <div>
-                <Label>Barcode</Label>
-                <Input v-model="form.barcode" type="text" />
-            </div>
-            <div>
-                <Label>Category</Label>
-                <Select v-model="form.category_id">
-                    <SelectItem v-for="category in categories" :key="category.id" :value="category.id">
-                        {{ category.name }}
-                    </SelectItem>
-                </Select>
-            </div>
-            <div>
-                <Label>Image</Label>
-                <input type="file" @change="handleFileUpload" class="w-full border p-2" />
-            </div>
-            <div>
-                <Label>COGS</Label>
-                <Input v-model="form.cogs" type="number" required />
-            </div>
-            <div>
-                <Label>Price</Label>
-                <Input v-model="form.price" type="number" required />
-            </div>
-            <div>
-                <Label>Minimum Stock</Label>
-                <Input v-model="form.min_stock" type="number" required />
-            </div>
-            <div>
-                <Label>Weight (kg)</Label>
-                <Input v-model="form.weight" type="number" />
-            </div>
-            <div>
-                <Label>Description</Label>
-                <Input v-model="form.description" type="text" />
-            </div>
+                        <div>
+                            <Label for="sku">SKU / Kode </Label>
+                            <Input required id="sku" v-model="form.sku" :disabled="autoSku" @input="checkSku" :class="{ 'border-red-500': skuExists }" />
+                            <span v-if="loadingSkuCheck" class="text-gray-500">Checking...</span>
+                            <span v-else-if="skuExists" class="text-red-500">SKU already exists!</span>
+                            <span v-else-if="form.sku !== ''" class="text-green-500">SKU available</span>
+                        </div>
+                        <!-- Nama Item -->
+                        <div>
+                            <Label for="name">Nama Item</Label>
+                            <Input id="name" v-model="form.name" required />
+                        </div>
 
-            <!-- 🛠 Variations Section -->
-            <div>
-                <h2 class="text-lg font-semibold">Variations</h2>
-                <div class="flex gap-2">
-                    <Input v-model="variationName" placeholder="e.g. Size, Color" />
-                    <Input v-model="variationOptions" placeholder="Options (comma-separated)" />
-                    <Button @click="addVariation" class="bg-green-500 text-white">➕ Add</Button>
+                        <!-- Minimum Stock -->
+
+                        <NumberField id="minimum_stock" v-model="form.minimum_stock" :min="1" required>
+                            <Label for="minimum_stock">Minimum Stock</Label>
+                            <NumberFieldContent>
+                                <NumberFieldDecrement />
+                                <NumberFieldInput />
+                                <NumberFieldIncrement />
+                            </NumberFieldContent>
+                        </NumberField>
+
+                        <!-- Harga Pokok -->
+
+                        <NumberField id="cost_price" v-model="form.cost_price" :format-options="formatOptions">
+                            <Label for="cost_price">Harga Pokok</Label>
+                            <NumberFieldContent>
+                                <NumberFieldDecrement />
+                                <NumberFieldInput />
+                                <NumberFieldIncrement />
+                            </NumberFieldContent>
+                        </NumberField>
+
+                        <!-- Harga Jual -->
+
+                        <NumberField id="balance" v-model="form.selling_price" :format-options="formatOptions">
+                            <Label for="balance">Harga Jual</Label>
+                            <NumberFieldContent>
+                                <NumberFieldDecrement />
+                                <NumberFieldInput />
+                                <NumberFieldIncrement />
+                            </NumberFieldContent>
+                        </NumberField>
+
+                        <!-- Kategori -->
+                        <div>
+                            <Label for="category_id">Kategori</Label>
+                            <Select v-model="form.category_id">
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Pilih Kategori" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem v-for="category in categories" :key="category.id" :value="category.id.toString()">
+                                        {{ category.name }}
+                                    </SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        <!-- Satuan -->
+                        <div>
+                            <Label for="unit_id">Satuan</Label>
+                            <Select v-model="form.unit_id">
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Pilih Satuan" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem v-for="unit in units" :key="unit.id" :value="unit.id.toString()">
+                                        {{ unit.name }}
+                                    </SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        <!-- Description -->
+                        <div>
+                            <Label for="name">Deskripsi</Label>
+                            <Textarea id="name" v-model="form.description" class="resize-none" />
+                        </div>
+                    </div>
+                    <div class="w-1/2">
+                        <!-- Upload Gambar -->
+                        <div>
+                            <img v-if="previewImage" :src="previewImage" alt="Preview" class="mt-2 h-32 w-32 rounded-lg shadow-md" />
+                            <Label for="image">Upload Gambar</Label>
+                            <Input type="file" id="image" @change="handleFileChange" accept="image/*" />
+                        </div>
+                    </div>
+                    <!-- Tombol Aksi -->
                 </div>
+                <div class="flex justify-end space-x-2">
+                    <Button type="button" :disabled="form.processing" variant="outline" @click="router.visit(route('item.index'))"> Batal </Button>
+                    <Button type="submit" :disabled="skuExists || form.processing">
+                        <span v-if="form.processing" class="flex">
+                            <ReloadIcon class="mr-2 h-4 w-4 animate-spin" />
+                            Please wait
+                        </span>
 
-                <!-- List Variations -->
-                <div v-for="(variation, index) in form.variations" :key="index" class="mt-2 rounded bg-gray-100 p-2">
-                    <strong>{{ variation.name }}</strong
-                    >: {{ variation.options.join(', ') }}
-                    <Button size="sm" @click="removeVariation(index)" class="ml-2 bg-red-500 text-white">❌</Button>
+                        <span v-else>Submit</span>
+                    </Button>
                 </div>
-            </div>
-
-            <Button type="submit" class="bg-blue-500 text-white">Save Item</Button>
-        </form>
-    </div>
+            </form>
+        </div>
+    </AuthenticatedLayout>
 </template>
