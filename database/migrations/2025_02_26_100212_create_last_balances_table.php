@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('transactions', function (Blueprint $table) {
+        Schema::create('last_balances', function (Blueprint $table) {
             $table->id();
-            $table->date('transaction_date');
-            $table->text('description');
-            $table->foreignId('created_by')->nullable()->constrained('users')->onDelete('set null');
+            $table->foreignId('item_id')->constrained()->onDelete('cascade');
+            // $table->foreignId('warehouse_id')->constrained()->onDelete('cascade');
+            $table->integer('last_balance')->default(0); // Saldo terakhir stok
             $table->timestamps();
         });
     }
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('transactions');
+        Schema::dropIfExists('last_balances');
     }
 };

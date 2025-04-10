@@ -27,6 +27,7 @@ class CompanyController extends Controller
             'website' => 'nullable|url|max:255',
             'registration_number' => 'nullable|string|max:50',
             'currency' => 'required|string|max:10',
+            'language' => 'required|string|max:10',
             'decimal' => 'required|integer|max:1',
             'timezone' => 'required|string|max:50',
             'theme' => 'required|string|in:light,dark',
@@ -76,9 +77,10 @@ class CompanyController extends Controller
             'currency' => 'required|string|max:10',
             'timezone' => 'required|string|max:50',
             'decimal' => 'required|integer|max:1',
+            'language' => 'required|string|max:10',
         ]);
 
-        $company->update($request->only(['currency', 'timezone', 'decimal']));
+        $company->update($request->only(['currency', 'timezone', 'decimal', 'language']));
 
         return redirect()->back()->with('success', 'Preferences updated.');
     }

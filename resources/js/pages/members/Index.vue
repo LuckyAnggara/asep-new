@@ -1,17 +1,11 @@
 <template>
     <AuthenticatedLayout>
         <div class="flex items-center">
-            <h1 class="text-lg font-semibold md:text-2xl">Anggota</h1>
+            <h1 class="text-lg font-semibold md:text-2xl">{{ $t('member.title') }}</h1>
         </div>
-        <div
-            class="flex-1 flex-col items-center justify-center rounded-lg border border-dashed p-6 shadow-sm"
-        >
-            <Button class="mb-4" @click="toCreate()">Tambah Member</Button>
-            <MemberTable
-                :members="members"
-                @edit="editMember"
-                @delete="deleteMember"
-            />
+        <div class="flex-1 flex-col items-center justify-center rounded-lg border border-dashed p-6 shadow-sm">
+            <Button class="mb-4" @click="toCreate()"><PlusIcon class="" /> {{ $t('member.add_member') }}</Button>
+            <MemberTable :members="members" @edit="editMember" @delete="deleteMember" />
         </div>
     </AuthenticatedLayout>
 </template>
@@ -21,6 +15,7 @@ import MemberTable from '@/components/MemberTable.vue';
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue';
 import { router } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button';
+import { PlusIcon } from 'lucide-vue-next';
 
 defineProps({
     members: Object,

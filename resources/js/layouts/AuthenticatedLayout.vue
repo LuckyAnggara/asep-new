@@ -3,18 +3,12 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { vAutoAnimate } from '@formkit/auto-animate/vue';
 import { Link, router, usePage } from '@inertiajs/vue3';
 import { useMainStore } from '@/stores/main';
-import Toaster from '@/components/ui/toast/Toaster.vue';
+// import Toaster from '@/components/ui/toast/Toaster.vue';
+import { Toaster } from 'vue-sonner';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@iconify/vue';
 import { useColorMode } from '@vueuse/core';
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 
 import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
 import {
@@ -45,17 +39,14 @@ import {
     SidebarRail,
     SidebarTrigger,
 } from '@/components/ui/sidebar';
-import {
-    BadgeCheck,
-    ChevronRight,
-    ChevronsUpDown,
-    GalleryVerticalEnd,
-    LogOut,
-    Settings2,
-} from 'lucide-vue-next';
+import { BadgeCheck, ChevronRight, ChevronsUpDown, GalleryVerticalEnd, LogOut, Settings2 } from 'lucide-vue-next';
 import { computed } from 'vue';
+import getMenus from '@/lib/menus';
+import { ref } from 'vue';
+
 const mode = useColorMode();
 const mainStore = useMainStore();
+const menus = ref(getMenus());
 const page = usePage();
 const company = computed(() => page.props.auth.company);
 // This is sample data.
@@ -68,8 +59,9 @@ const data = computed(() => {
     };
 });
 
-const getLogoImage = () =>
-    company.value.logo ? `/storage/${company.value.logo}` : '';
+// const menus = computed(() => mainStore.menus);
+
+const getLogoImage = () => (company.value.logo ? `/storage/${company.value.logo}` : '');
 
 function goTo(url) {
     router.visit(route(url), {
@@ -101,15 +93,9 @@ function active(item) {
                                         class="size-4"
                                     /> -->
                                 </div>
-                                <div
-                                    class="grid flex-1 text-left text-sm leading-tight"
-                                >
-                                    <span class="truncate font-semibold">{{
-                                        company.name
-                                    }}</span>
-                                    <span class="truncate text-xs">{{
-                                        company.slogan
-                                    }}</span>
+                                <div class="grid flex-1 text-left text-sm leading-tight">
+                                    <span class="truncate font-semibold">{{ company.name }}</span>
+                                    <span class="truncate text-xs">{{ company.slogan }}</span>
                                 </div>
                             </div>
                             <DropdownMenu>
@@ -123,21 +109,13 @@ function active(item) {
                                             icon="radix-icons:sun"
                                             class="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100"
                                         />
-                                        <span class="sr-only"
-                                            >Toggle theme</span
-                                        >
+                                        <span class="sr-only">Toggle theme</span>
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
-                                    <DropdownMenuItem @click="mode = 'light'">
-                                        Light
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem @click="mode = 'dark'">
-                                        Dark
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem @click="mode = 'auto'">
-                                        System
-                                    </DropdownMenuItem>
+                                    <DropdownMenuItem @click="mode = 'light'"> Light </DropdownMenuItem>
+                                    <DropdownMenuItem @click="mode = 'dark'"> Dark </DropdownMenuItem>
+                                    <DropdownMenuItem @click="mode = 'auto'"> System </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         </div>
@@ -151,7 +129,7 @@ function active(item) {
                     <SidebarMenu>
                         <Collapsible
                             @click="active(item)"
-                            v-for="(item, index) in mainStore.menus"
+                            v-for="(item, index) in menus"
                             :key="index"
                             as-child
                             class="group/collapsible"
@@ -160,23 +138,11 @@ function active(item) {
                             <SidebarMenuItem>
                                 <SidebarMenuButton :tooltip="item.title">
                                     <component :is="item.icon" />
-                                    <span v-if="item.items">{{
-                                        item.title
-                                    }}</span>
-                                    <button
-                                        type="button"
-                                        @click="goTo(item.url)"
-                                        v-else
-                                    >
+                                    <span v-if="item.items">{{ item.title }}</span>
+                                    <button type="button" @click="goTo(item.url)" v-else>
                                         {{ item.title }}
                                     </button>
-                                    <!-- <Link
-                                            :href="route(item.url)"
-                                            v-else
-                                            preserve-state
-                                        >
-                                            {{ item.title }}
-                                        </Link> -->
+
                                     <ChevronRight
                                         v-if="item.items"
                                         class="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90"
@@ -184,15 +150,9 @@ function active(item) {
                                 </SidebarMenuButton>
                                 <CollapsibleContent v-if="item.items">
                                     <SidebarMenuSub>
-                                        <SidebarMenuSubItem
-                                            v-for="subItem in item.items"
-                                            :key="subItem.title"
-                                        >
+                                        <SidebarMenuSubItem v-for="subItem in item.items" :key="subItem.title">
                                             <SidebarMenuSubButton as-child>
-                                                <button
-                                                    type="button"
-                                                    @click="goTo(subItem.url)"
-                                                >
+                                                <button type="button" @click="goTo(subItem.url)">
                                                     {{ subItem.title }}
                                                 </button>
                                                 <!-- <Link
@@ -217,63 +177,30 @@ function active(item) {
                     <SidebarMenuItem>
                         <DropdownMenu>
                             <DropdownMenuTrigger as-child>
-                                <SidebarMenuButton
-                                    size="lg"
-                                    class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-                                >
+                                <SidebarMenuButton size="lg" class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
                                     <Avatar
                                         class="h-8 w-8 rounded-lg transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-4 group-has-[[data-collapsible=icon]]/sidebar-wrapper:w-4"
                                     >
-                                        <AvatarImage
-                                            :src="data.user.avatar"
-                                            :alt="data.user.name"
-                                        />
-                                        <AvatarFallback class="rounded-lg">
-                                            CN
-                                        </AvatarFallback>
+                                        <AvatarImage :src="data.user.avatar" :alt="data.user.name" />
+                                        <AvatarFallback class="rounded-lg"> CN </AvatarFallback>
                                     </Avatar>
-                                    <div
-                                        class="grid flex-1 text-left text-sm leading-tight"
-                                    >
-                                        <span class="truncate font-semibold">{{
-                                            data.user.name
-                                        }}</span>
-                                        <span class="truncate text-xs">{{
-                                            data.user.email
-                                        }}</span>
+                                    <div class="grid flex-1 text-left text-sm leading-tight">
+                                        <span class="truncate font-semibold">{{ data.user.name }}</span>
+                                        <span class="truncate text-xs">{{ data.user.email }}</span>
                                     </div>
                                     <ChevronsUpDown class="ml-auto size-4" />
                                 </SidebarMenuButton>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent
-                                class="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
-                                side="bottom"
-                                align="end"
-                                :side-offset="4"
-                            >
+                            <DropdownMenuContent class="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg" side="bottom" align="end" :side-offset="4">
                                 <DropdownMenuLabel class="p-0 font-normal">
-                                    <div
-                                        class="flex items-center gap-2 px-1 py-1.5 text-left text-sm"
-                                    >
+                                    <div class="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                                         <Avatar class="h-8 w-8 rounded-lg">
-                                            <AvatarImage
-                                                :src="data.user.avatar"
-                                                :alt="data.user.name"
-                                            />
-                                            <AvatarFallback class="rounded-lg">
-                                                CN
-                                            </AvatarFallback>
+                                            <AvatarImage :src="data.user.avatar" :alt="data.user.name" />
+                                            <AvatarFallback class="rounded-lg"> CN </AvatarFallback>
                                         </Avatar>
-                                        <div
-                                            class="grid flex-1 text-left text-sm leading-tight"
-                                        >
-                                            <span
-                                                class="truncate font-semibold"
-                                                >{{ data.user.name }}</span
-                                            >
-                                            <span class="truncate text-xs">{{
-                                                data.user.email
-                                            }}</span>
+                                        <div class="grid flex-1 text-left text-sm leading-tight">
+                                            <span class="truncate font-semibold">{{ data.user.name }}</span>
+                                            <span class="truncate text-xs">{{ data.user.email }}</span>
                                         </div>
                                     </div>
                                 </DropdownMenuLabel>
@@ -283,9 +210,7 @@ function active(item) {
                                 <DropdownMenuGroup>
                                     <DropdownMenuItem>
                                         <BadgeCheck />
-                                        <Link :href="route('profile.edit')">
-                                            Account
-                                        </Link>
+                                        <Link :href="route('profile.edit')"> Account </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem>
                                         <Settings2 />
@@ -295,13 +220,7 @@ function active(item) {
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem>
                                     <LogOut />
-                                    <Link
-                                        :href="route('logout')"
-                                        method="post"
-                                        as="a"
-                                    >
-                                        Log Out
-                                    </Link>
+                                    <Link :href="route('logout')" method="post" as="a"> Log Out </Link>
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
@@ -320,9 +239,7 @@ function active(item) {
                     <Breadcrumb>
                         <BreadcrumbList>
                             <BreadcrumbItem class="hidden md:block">
-                                <BreadcrumbLink href="#">
-                                    Building Your Application
-                                </BreadcrumbLink>
+                                <BreadcrumbLink href="#"> Building Your Application </BreadcrumbLink>
                             </BreadcrumbItem>
                             <BreadcrumbSeparator class="hidden md:block" />
                             <BreadcrumbItem>
@@ -332,12 +249,10 @@ function active(item) {
                     </Breadcrumb>
                 </div>
             </header>
-            <main
-                class="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6"
-                v-auto-animate
-            >
+            <main class="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6" v-auto-animate>
                 <!-- Page Content -->
-                <Toaster />
+
+                <Toaster position="bottom-center" richColors />
                 <slot />
             </main>
         </SidebarInset>
