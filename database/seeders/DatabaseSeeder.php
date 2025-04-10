@@ -21,8 +21,10 @@ class DatabaseSeeder extends Seeder
         //     ->count(20)
         //     ->has(JournalEntryDetail::factory()->count(rand(2, 4)), 'details')
         //     ->create();
-        Item::factory(500)->create();
         // $this->call(AccountingSeeder::class);
+        $this->call(UnitSeeder::class);
+        $this->call(ItemCategorySeeder::class);
+        $this->call(ItemSeeder::class);
         // $this->call(MemberSeeder::class);
         // $this->call(JournalEntrySeeder::class);
     }

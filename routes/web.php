@@ -9,6 +9,7 @@ use App\Http\Controllers\ChartOfAccountController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\FinancialStatementController;
 use App\Http\Controllers\IncomeStatementController;
+use App\Http\Controllers\InventoryTransactionController;
 use App\Http\Controllers\ItemCategoryController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\JournalEntryController;
@@ -81,13 +82,16 @@ Route::get('report/finance/journal-summary', [ReportController::class, 'journalS
 
 
 // Inventory Management Module
-Route::resource('inventory/warehouse', WarehouseController::class)
-    ->middleware(['auth', 'verified']);
+// Route::resource('inventory/warehouse', WarehouseController::class)
+//     ->middleware(['auth', 'verified']);
 Route::resource('inventory/item', ItemController::class)
     ->middleware(['auth', 'verified']);
 Route::resource('inventory/item-category', ItemCategoryController::class)
     ->middleware(['auth', 'verified']);
+Route::resource('inventory/transaction', InventoryTransactionController::class)
+    ->middleware(['auth', 'verified']);
 
 Route::get('/item/check-sku', [ItemController::class, 'checkSku'])->name('item.checkSku');
+Route::get('/item/search-item', [ItemController::class, 'search'])->name('item.search');
 
 require __DIR__ . '/auth.php';

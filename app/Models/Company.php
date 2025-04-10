@@ -18,6 +18,7 @@ class Company extends Model
         'email',
         'website',
         'registration_number',
+        'language',
         'currency',
         'decimal',
         'timezone',

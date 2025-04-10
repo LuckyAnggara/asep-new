@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('phone')->nullable();
             $table->string('email')->nullable();
             $table->string('website')->nullable();
+            $table->string('language')->nullable();
             $table->string('registration_number')->nullable(); // NPWP atau nomor registrasi
             $table->string('currency')->default('IDR'); // Mata uang default
             $table->integer('decimal')->default(2); // Mata uang default

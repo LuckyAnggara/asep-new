@@ -41,8 +41,12 @@ import {
 } from '@/components/ui/sidebar';
 import { BadgeCheck, ChevronRight, ChevronsUpDown, GalleryVerticalEnd, LogOut, Settings2 } from 'lucide-vue-next';
 import { computed } from 'vue';
+import getMenus from '@/lib/menus';
+import { ref } from 'vue';
+
 const mode = useColorMode();
 const mainStore = useMainStore();
+const menus = ref(getMenus());
 const page = usePage();
 const company = computed(() => page.props.auth.company);
 // This is sample data.
@@ -54,6 +58,8 @@ const data = computed(() => {
         },
     };
 });
+
+// const menus = computed(() => mainStore.menus);
 
 const getLogoImage = () => (company.value.logo ? `/storage/${company.value.logo}` : '');
 
@@ -123,7 +129,7 @@ function active(item) {
                     <SidebarMenu>
                         <Collapsible
                             @click="active(item)"
-                            v-for="(item, index) in mainStore.menus"
+                            v-for="(item, index) in menus"
                             :key="index"
                             as-child
                             class="group/collapsible"
@@ -136,13 +142,7 @@ function active(item) {
                                     <button type="button" @click="goTo(item.url)" v-else>
                                         {{ item.title }}
                                     </button>
-                                    <!-- <Link
-                                            :href="route(item.url)"
-                                            v-else
-                                            preserve-state
-                                        >
-                                            {{ item.title }}
-                                        </Link> -->
+
                                     <ChevronRight
                                         v-if="item.items"
                                         class="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90"
@@ -252,7 +252,7 @@ function active(item) {
             <main class="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6" v-auto-animate>
                 <!-- Page Content -->
 
-                <Toaster position="bottom-center" />
+                <Toaster position="bottom-center" richColors />
                 <slot />
             </main>
         </SidebarInset>

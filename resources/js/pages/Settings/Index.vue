@@ -14,11 +14,14 @@ import Textarea from '@/Components/ui/textarea/Textarea.vue';
 import { ReloadIcon } from '@radix-icons/vue';
 import { useToast } from '@/Components/ui/toast';
 import { Trash2, X } from 'lucide-vue-next';
+import { useI18n } from 'vue-i18n';
 
+const { t, locale } = useI18n();
 const props = defineProps({ company: Object, coa: Array });
 const page = usePage();
 const { system, store } = useColorMode();
-const { toast } = useToast();
+import { toast } from 'vue-sonner';
+// const { toast } = useToast();
 const fileError = ref('');
 const onProses = ref(false);
 const previewImage = ref(null);
@@ -37,7 +40,7 @@ const formCompany = useForm({
 const formPreferences = useForm({
     currency: props.company.currency || 'IDR',
     decimal: props.company.decimal || 2,
-    language: props.company.language || 'id',
+    language: props.company.language || 'en',
     timezone: props.company.timezone || 'Asia/Jakarta',
 });
 
@@ -55,7 +58,6 @@ const getLogoImage = () => (previewImage.value == null ? (formCompany.logo ? `/s
 
 const submitCompany = () => {
     const formData = new FormData();
-
     // Append form values to FormData
     formData.append('_method', 'put');
     formData.append('name', formCompany.name || '');
@@ -78,42 +80,30 @@ const submitCompany = () => {
         onFinish: () => {
             onProses.value = false;
         },
-        onSuccess: () => {
-            toast({
-                title: 'Success',
-                description: `Data berhasil di update`,
-            });
-        },
+
         onProgress: () => {
             onProses.value = true;
         },
+        onSuccess: () => {
+            toast.success(t('settings.success_message'));
+        },
         onError: (errors) => {
-            toast({
-                title: 'Error',
-                description: errors,
-                variant: 'destructive',
-            });
+            toast.error(t('settings.error_message'));
         },
     });
 };
 
 const submitPreferences = () => {
+    locale.value = formPreferences.language;
     formPreferences.put(route('settings.updatePreferences', props.company.id), {
         preserveState: true,
         replace: true,
         async: true,
         onSuccess: () => {
-            toast({
-                title: 'Success',
-                description: `Data berhasil di update`,
-            });
+            toast.success(t('settings.success_message'));
         },
         onError: (errors) => {
-            toast({
-                title: 'Error',
-                description: errors,
-                variant: 'destructive',
-            });
+            toast.error(t('settings.error_message'));
         },
     });
 };
@@ -124,17 +114,10 @@ const updateAccount = () => {
         replace: true,
         async: true,
         onSuccess: () => {
-            toast({
-                title: 'Success',
-                description: `Data berhasil di update`,
-            });
+            toast.success(t('settings.success_message'));
         },
         onError: (errors) => {
-            toast({
-                title: 'Error',
-                description: errors,
-                variant: 'destructive',
-            });
+            toast.error(t('settings.error_message'));
         },
     });
 };
@@ -145,18 +128,10 @@ const updatePassword = () => {
         replace: true,
         async: true,
         onSuccess: () => {
-            toast({
-                title: 'Success',
-                description: `Password berhasil diperbaharui`,
-            });
-            formSecurity.reset();
+            toast.success(t('settings.success_message'));
         },
         onError: (errors) => {
-            toast({
-                title: 'Error',
-                description: errors,
-                variant: 'destructive',
-            });
+            toast.error(t('settings.error_message'));
         },
     });
 };
@@ -177,11 +152,7 @@ const handleFileUpload = (event) => {
     // Validasi ukuran file (maks 4MB)
     if (selectedFile.size > 4096000) {
         fileError.value = true;
-        toast({
-            title: 'Error',
-            description: 'File size exceeds 4MB',
-            variant: 'destructive',
-        });
+        toast.error(t('settings.error_message_size'));
         event.target.value = null; // Reset input
         return;
     }
@@ -189,11 +160,8 @@ const handleFileUpload = (event) => {
     // Validasi tipe file
     if (!allowedTypes.includes(selectedFile.type)) {
         fileError.value = true;
-        toast({
-            title: 'Error',
-            description: 'Unsupported file type. Allowed types: JPEG, PNG, GIF, WEBP, SVG, BMP.',
-            variant: 'destructive',
-        });
+        toast.error(t('settings.error_message_type'));
+
         event.target.value = null; // Reset input
         return;
     }
@@ -219,51 +187,50 @@ function removeLogo() {
 <template>
     <AuthenticatedLayout>
         <div class="flex items-center">
-            <h1 class="text-lg font-semibold md:text-2xl">Setting Apps</h1>
+            <h1 class="text-lg font-semibold md:text-2xl">{{ $t('settings.title') }}</h1>
         </div>
         <div class="flex-1 flex-col items-center justify-center rounded-lg border border-dashed p-6 shadow-sm">
             <Tabs default-value="company" class="mb-5">
                 <TabsList>
-                    <TabsTrigger value="company">Company</TabsTrigger>
-                    <TabsTrigger value="preferences">Preferences</TabsTrigger>
-                    <TabsTrigger value="security">Security</TabsTrigger>
-                    <TabsTrigger value="account">Account</TabsTrigger>
+                    <TabsTrigger value="company">{{ $t('settings.tabs.company') }}</TabsTrigger>
+                    <TabsTrigger value="preferences">{{ $t('settings.tabs.preferences') }}</TabsTrigger>
+                    <TabsTrigger value="security">{{ $t('settings.tabs.security') }}</TabsTrigger>
+                    <TabsTrigger value="account">{{ $t('settings.tabs.account') }}</TabsTrigger>
                 </TabsList>
-
                 <!-- Company Settings -->
                 <TabsContent value="company" class="my-6">
-                    <h3 class="mb-2 text-lg font-semibold">Company Settings</h3>
+                    <h3 class="mb-2 text-lg font-semibold">{{ $t('settings.company.title') }}</h3>
                     <form @submit.prevent="submitCompany" class="">
                         <div class="mb-6 flex flex-row space-x-4">
                             <div class="w-full space-y-4 lg:w-1/3">
                                 <div class="grid gap-4">
                                     <div>
-                                        <Label for="name">Company Name</Label>
+                                        <Label for="name">{{ $t('settings.company.name') }}</Label>
                                         <Input id="name" v-model="formCompany.name" required />
                                     </div>
 
                                     <div>
-                                        <Label for="slogan">Slogan</Label>
+                                        <Label for="slogan">{{ $t('settings.company.slogan') }}</Label>
                                         <Input id="slogan" v-model="formCompany.slogan" />
                                     </div>
 
                                     <div>
-                                        <Label for="address">Address</Label>
+                                        <Label for="address">{{ $t('settings.company.address') }}</Label>
                                         <Textarea class="resize-none" id="address" v-model="formCompany.address" />
                                     </div>
 
                                     <div>
-                                        <Label for="phone">Phone</Label>
+                                        <Label for="phone">{{ $t('settings.company.phone') }}</Label>
                                         <Input id="phone" v-model="formCompany.phone" />
                                     </div>
 
                                     <div>
-                                        <Label for="email">Email</Label>
+                                        <Label for="email">{{ $t('settings.company.email') }}</Label>
                                         <Input id="email" v-model="formCompany.email" />
                                     </div>
 
                                     <div>
-                                        <Label for="website">Website</Label>
+                                        <Label for="website">{{ $t('settings.company.website') }}</Label>
                                         <Input id="website" v-model="formCompany.website" />
                                     </div>
                                 </div>
@@ -276,9 +243,9 @@ function removeLogo() {
                                 </div>
 
                                 <div>
-                                    <Label for="logo">Logo</Label>
+                                    <Label for="logo">{{ $t('settings.company.logo') }}</Label>
                                     <Input id="logo" type="file" @change="handleFileUpload" />
-                                    <p v-if="fileError" class="text-[0.8rem] font-medium text-destructive">Maksimal size 4MB</p>
+                                    <p v-if="fileError" class="text-[0.8rem] font-medium text-destructive">{{ $t('settings.error_message_size') }}</p>
                                 </div>
                             </div>
                         </div>
@@ -287,10 +254,10 @@ function removeLogo() {
                             <Button type="submit" :disabled="onProses">
                                 <span v-if="onProses" class="flex">
                                     <ReloadIcon class="mr-2 h-4 w-4 animate-spin" />
-                                    Please wait
+                                    {{ $t('settings.please_wait') }}
                                 </span>
 
-                                <span v-else>Update</span>
+                                <span v-else>{{ $t('settings.update') }}</span>
                             </Button>
                         </div>
                     </form>
@@ -298,15 +265,15 @@ function removeLogo() {
 
                 <!-- Preferences -->
                 <TabsContent value="preferences" class="my-6">
-                    <h3 class="mb-2 text-lg font-semibold">App Preferences</h3>
+                    <h3 class="mb-2 text-lg font-semibold">{{ $t('settings.preferences.title') }}</h3>
                     <form @submit.prevent="submitPreferences">
                         <div class="flex flex-row space-x-6">
                             <div class="mb-6 grid w-full gap-4 lg:w-1/3">
                                 <div>
-                                    <Label for="language">Bahasa</Label>
+                                    <Label for="language">{{ $t('settings.preferences.language') }}</Label>
                                     <Select id="language" v-model="formPreferences.language">
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Pilih Bahasa" />
+                                            <SelectValue :placeholder="$t('settings.preferences.select_language')" />
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="en"> English </SelectItem>
@@ -315,10 +282,10 @@ function removeLogo() {
                                     </Select>
                                 </div>
                                 <div>
-                                    <Label for="currency">Default Currency</Label>
+                                    <Label for="currency">{{ $t('settings.preferences.currency') }}</Label>
                                     <Select id="currency" v-model="formPreferences.currency">
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Pilih Currency" />
+                                            <SelectValue :placeholder="$t('settings.preferences.select_currency')" />
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="IDR"> IDR (Indonesian Rupiah) </SelectItem>
@@ -328,7 +295,7 @@ function removeLogo() {
                                     </Select>
                                 </div>
                                 <div>
-                                    <Label for="currency">Decimal</Label>
+                                    <Label for="currency">{{ $t('settings.preferences.decimal') }}</Label>
                                     <NumberField v-model="formPreferences.decimal">
                                         <NumberFieldContent>
                                             <NumberFieldDecrement />
@@ -338,10 +305,10 @@ function removeLogo() {
                                     </NumberField>
                                 </div>
                                 <div>
-                                    <Label for="timezone">Timezone</Label>
+                                    <Label for="timezone">{{ $t('settings.preferences.timezone') }}</Label>
                                     <Select id="timezone" v-model="formPreferences.timezone">
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Pilih Timezone" />
+                                            <SelectValue :placeholder="$t('settings.preferences.select_timezone')" />
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="Asia/Jakarta"> Asia/Jakarta </SelectItem>
@@ -353,7 +320,7 @@ function removeLogo() {
                             </div>
                             <div class="items-center justify-center rounded-lg border border-dashed p-6 shadow-sm lg:w-1/3">
                                 <div>
-                                    <Label for="language">Preview Currency</Label>
+                                    <Label for="language">{{ $t('settings.preferences.preview_currency') }}</Label>
                                     <p>{{ formatCurrency(10000) }}</p>
                                 </div>
                             </div>
@@ -363,10 +330,10 @@ function removeLogo() {
                             <Button type="submit" :disabled="formPreferences.processing">
                                 <span v-if="formPreferences.processing" class="flex">
                                     <ReloadIcon class="mr-2 h-4 w-4 animate-spin" />
-                                    Please wait
+                                    {{ $t('settings.please_wait') }}
                                 </span>
 
-                                <span v-else>Update</span>
+                                <span v-else> {{ $t('settings.update') }}</span>
                             </Button>
                         </div>
                     </form>
@@ -374,21 +341,21 @@ function removeLogo() {
 
                 <!-- Security -->
                 <TabsContent value="security" class="my-6">
-                    <h3 class="mb-2 text-lg font-semibold">Security</h3>
+                    <h3 class="mb-2 text-lg font-semibold">{{ $t('settings.security.title') }}</h3>
                     <form @submit.prevent="updatePassword">
                         <div class="mb-6 grid w-full gap-4 lg:w-1/3">
                             <div>
-                                <Label for="current_password">Current Password</Label>
+                                <Label for="current_password">{{ $t('settings.security.current_password') }}</Label>
                                 <Input type="password" id="current_password" v-model="formSecurity.current_password" required />
                             </div>
 
                             <div>
-                                <Label for="new_password">New Password</Label>
+                                <Label for="new_password">{{ $t('settings.security.new_password') }}</Label>
                                 <Input type="password" id="new_password" v-model="formSecurity.new_password" required />
                             </div>
 
                             <div>
-                                <Label for="confirm_password">Confirm Password</Label>
+                                <Label for="confirm_password">{{ $t('settings.security.confirm_password') }}</Label>
                                 <Input type="password" id="confirm_password" v-model="formSecurity.new_password_confirmation" required />
                             </div>
                         </div>
@@ -398,10 +365,10 @@ function removeLogo() {
                             <Button type="submit" :disabled="formSecurity.processing">
                                 <span v-if="formSecurity.processing" class="flex">
                                     <ReloadIcon class="mr-2 h-4 w-4 animate-spin" />
-                                    Please wait
+                                    {{ $t('settings.please_wait') }}
                                 </span>
 
-                                <span v-else>Update</span>
+                                <span v-else> {{ $t('settings.update') }}</span>
                             </Button>
                         </div>
                     </form>
@@ -409,14 +376,14 @@ function removeLogo() {
 
                 <!-- Account -->
                 <TabsContent value="account" class="my-6">
-                    <h3 class="mb-2 text-lg font-semibold">Account</h3>
+                    <h3 class="mb-2 text-lg font-semibold">{{ $t('settings.account.title') }}</h3>
                     <form @submit.prevent="updateAccount">
                         <div class="mb-6 grid w-full gap-4 lg:w-1/3">
                             <div>
-                                <Label for="re">Retained Earning Account</Label>
+                                <Label for="re">{{ $t('settings.account.retained_earning_account') }}</Label>
                                 <Select id="re" v-model="formAccount.retained_earning_id" clearable>
                                     <SelectTrigger>
-                                        <SelectValue placeholder="Pilih Account Retained Earning" />
+                                        <SelectValue :placeholder="$t('settings.account.select_account')" />
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem :value="item.id" v-for="item in coa" :key="item.id"> {{ item.code }} - {{ item.name }} </SelectItem>
@@ -430,10 +397,10 @@ function removeLogo() {
                             <Button type="submit" :disabled="formAccount.processing">
                                 <span v-if="formAccount.processing" class="flex">
                                     <ReloadIcon class="mr-2 h-4 w-4 animate-spin" />
-                                    Please wait
+                                    {{ $t('settings.please_wait') }}
                                 </span>
 
-                                <span v-else>Update</span>
+                                <span v-else> {{ $t('settings.update') }}</span>
                             </Button>
                         </div>
                     </form>

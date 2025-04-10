@@ -11,12 +11,17 @@ class ItemCategorySeeder extends Seeder
     /**
      * Run the database seeds.
      */
-    public function run(): void
+    public function run()
     {
-        $categories = ['Electronics', 'Furniture', 'Clothing', 'Food & Beverage'];
+        $categories = [
+            ['name' => 'Electronics', 'description' => 'Electronic devices and accessories'],
+            ['name' => 'Furniture', 'description' => 'Tables, chairs, and other furniture'],
+            ['name' => 'Office Supplies', 'description' => 'Stationery and office tools'],
+            ['name' => 'Groceries', 'description' => 'Food items and daily needs'],
+        ];
 
         foreach ($categories as $category) {
-            ItemCategory::create(['name' => $category]);
+            ItemCategory::create($category);
         }
     }
 }

@@ -14,11 +14,13 @@ return new class extends Migration
         Schema::create('items', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+
             $table->string('image')->nullable();
             $table->string('sku')->unique(); // Tambahkan SKU
             $table->integer('minimum_stock')->default(0);
             $table->decimal('cost_price', 10, 2);
             $table->decimal('selling_price', 10, 2);
+            $table->string('description')->nullable();
             // $table->string('barcode')->unique();
             $table->foreignId('category_id')->constrained('item_categories')->onDelete('cascade');
             $table->foreignId('unit_id')->constrained('units')->onDelete('cascade');
